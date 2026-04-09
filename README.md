@@ -16,8 +16,8 @@ Mets une etoile pour soutenir le projet et recevoir les notifications de mises a
 
 ## Statut
 
-- **5 / 66 patterns** publies avec code executable
-- 61 patterns en cours de redaction
+- **8 / 66 patterns** publies avec code executable
+- 58 patterns en cours de redaction
 - English version coming soon
 
 ---
@@ -36,6 +36,13 @@ Mets une etoile pour soutenir le projet et recevoir les notifications de mises a
 
 ### Calculs & Etat
 - [Pattern 05 — Unit Mismatch 100x](pattern-05/) — Valeur unitaire incoherente entre modules = calcul 100x trop gros
+- [Pattern 06 — Silent NameError](pattern-06/) — try/except generique masque un NameError, fonctionnalite silencieusement morte
+
+### Securite & Secrets
+- [Pattern 07 — Hardcoded Secret in Source](pattern-07/) — Token/cle API en clair dans le code source, expose dans git
+
+### I/O & Persistence
+- [Pattern 08 — Data Pipeline Freeze](pattern-08/) — Producteur change de format, consommateur lit des donnees gelees
 
 ---
 
