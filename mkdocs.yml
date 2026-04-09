@@ -1,0 +1,64 @@
+site_name: Multi-Agent Failure Patterns
+site_description: Catalogue technique des bugs critiques en architecture multi-agents IA, base sur 18 mois de production
+site_author: Samuel Pages
+site_url: https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/
+
+repo_url: https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns
+repo_name: GitHub
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: deep orange
+    accent: orange
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+
+extra:
+  social:
+    - icon: fontawesome/solid/paper-plane
+      link: https://tally.so/r/vGODE8
+      name: Newsletter — early-bird -50%
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - toc:
+      permalink: true
+
+nav:
+  - Accueil: index.md
+  - Temps & Synchronisation:
+    - "01 — Timezone Mismatch": 01-temps-synchronisation/pattern-01.md
+  - Boucles & Orchestration:
+    - "02 — Rapid-Fire Loop": 02-boucles-orchestration/pattern-02.md
+    - "03 — Cascade de Penalites": 02-boucles-orchestration/pattern-03.md
+    - "09 — Agent Infinite Loop": 02-boucles-orchestration/pattern-09.md
+  - Calculs & Etat:
+    - "05 — Unit Mismatch 100x": 03-calculs-etat/pattern-05.md
+    - "06 — Silent NameError": 03-calculs-etat/pattern-06.md
+  - Securite & Secrets:
+    - "07 — Hardcoded Secret": 04-securite-secrets/pattern-07.md
+  - I/O & Persistence:
+    - "04 — Multi-File State Desync": 05-io-persistence/pattern-04.md
+    - "08 — Data Pipeline Freeze": 05-io-persistence/pattern-08.md
+  - Filtrage & Decisions:
+    - "10 — Survival Mode Deadlock": 08-filtrage-decisions/pattern-10.md
+  - Gouvernance Multi-Agents:
+    - "11 — Race Condition Shared File": 09-gouvernance-multi-agents/pattern-11.md
