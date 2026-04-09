@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Catalogue technique des bugs critiques en architecture multi-agents IA, base sur 18 mois de production">
+        <meta name="description" content="Technical catalog of critical bugs in multi-agent AI systems architecture, based on 18 months of production">
       
       
         <meta name="author" content="Samuel Pages">
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#pattern-n10-survival-mode-deadlock" class="md-skip">
+        <a href="#pattern-10-survival-mode-deadlock" class="md-skip">
           Skip to content
         </a>
       
@@ -243,7 +243,7 @@
   <span class="md-ellipsis">
     
   
-    Accueil
+    Home
   
 
     
@@ -288,7 +288,7 @@
   <span class="md-ellipsis">
     
   
-    Temps & Synchronisation
+    Time & Synchronization
   
 
     
@@ -304,7 +304,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Temps & Synchronisation
+    Time & Synchronization
   
 
           </label>
@@ -377,7 +377,7 @@
   <span class="md-ellipsis">
     
   
-    Boucles & Orchestration
+    Loops & Orchestration
   
 
     
@@ -393,7 +393,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Boucles & Orchestration
+    Loops & Orchestration
   
 
           </label>
@@ -441,7 +441,7 @@
   <span class="md-ellipsis">
     
   
-    03 — Cascade de Penalites
+    03 — Penalty Cascade
   
 
     
@@ -522,7 +522,7 @@
   <span class="md-ellipsis">
     
   
-    Calculs & Etat
+    Computation & State
   
 
     
@@ -538,7 +538,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Calculs & Etat
+    Computation & State
   
 
           </label>
@@ -639,7 +639,7 @@
   <span class="md-ellipsis">
     
   
-    Securite & Secrets
+    Security & Secrets
   
 
     
@@ -655,7 +655,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Securite & Secrets
+    Security & Secrets
   
 
           </label>
@@ -845,7 +845,7 @@
   <span class="md-ellipsis">
     
   
-    Filtrage & Decisions
+    Filtering & Decisions
   
 
     
@@ -861,7 +861,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Filtrage & Decisions
+    Filtering & Decisions
   
 
           </label>
@@ -934,10 +934,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-symptome-observable" class="md-nav__link">
+  <a href="#1-observable-symptoms" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Symptome observable
+        1. Observable Symptoms
       
     </span>
   </a>
@@ -945,10 +945,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-histoire-vecue-anonymisee" class="md-nav__link">
+  <a href="#2-field-story-anonymized" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Histoire vecue (anonymisee)
+        2. Field Story (anonymized)
       
     </span>
   </a>
@@ -956,10 +956,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-cause-racine-technique" class="md-nav__link">
+  <a href="#3-technical-root-cause" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Cause racine technique
+        3. Technical Root Cause
       
     </span>
   </a>
@@ -979,10 +979,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#41-detection-manuelle-audit-code" class="md-nav__link">
+  <a href="#41-manual-code-audit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.1 Detection manuelle (audit code)
+        4.1 Manual code audit
       
     </span>
   </a>
@@ -990,10 +990,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#42-detection-automatisee-cicd" class="md-nav__link">
+  <a href="#42-automated-cicd" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.2 Detection automatisee (CI/CD)
+        4.2 Automated CI/CD
       
     </span>
   </a>
@@ -1001,10 +1001,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#43-detection-runtime-production" class="md-nav__link">
+  <a href="#43-runtime-production" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.3 Detection runtime (production)
+        4.3 Runtime production
       
     </span>
   </a>
@@ -1017,22 +1017,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-correction" class="md-nav__link">
+  <a href="#5-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Correction
+        5. Fix
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. Correction">
+    <nav class="md-nav" aria-label="5. Fix">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#51-fix-immediat" class="md-nav__link">
+  <a href="#51-immediate-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.1 Fix immediat
+        5.1 Immediate fix
       
     </span>
   </a>
@@ -1040,10 +1040,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#52-fix-robuste" class="md-nav__link">
+  <a href="#52-robust-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.2 Fix robuste
+        5.2 Robust fix
       
     </span>
   </a>
@@ -1056,10 +1056,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-prevention-architecturale" class="md-nav__link">
+  <a href="#6-architectural-prevention" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. Prevention architecturale
+        6. Architectural Prevention
       
     </span>
   </a>
@@ -1067,10 +1067,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-anti-patterns-a-eviter" class="md-nav__link">
+  <a href="#7-anti-patterns-to-avoid" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. Anti-patterns a eviter
+        7. Anti-patterns to Avoid
       
     </span>
   </a>
@@ -1078,10 +1078,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-cas-limites-et-variantes" class="md-nav__link">
+  <a href="#8-edge-cases-and-variants" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8. Cas limites et variantes
+        8. Edge Cases and Variants
       
     </span>
   </a>
@@ -1089,10 +1089,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#9-checklist-daudit" class="md-nav__link">
+  <a href="#9-audit-checklist" class="md-nav__link">
     <span class="md-ellipsis">
       
-        9. Checklist d'audit
+        9. Audit Checklist
       
     </span>
   </a>
@@ -1100,10 +1100,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#10-pour-aller-plus-loin" class="md-nav__link">
+  <a href="#10-further-reading" class="md-nav__link">
     <span class="md-ellipsis">
       
-        10. Pour aller plus loin
+        10. Further Reading
       
     </span>
   </a>
@@ -1158,7 +1158,7 @@
   <span class="md-ellipsis">
     
   
-    Gouvernance Multi-Agents
+    Multi-Agent Governance
   
 
     
@@ -1174,7 +1174,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Gouvernance Multi-Agents
+    Multi-Agent Governance
   
 
           </label>
@@ -1194,7 +1194,7 @@
   <span class="md-ellipsis">
     
   
-    11 — Race Condition Shared File
+    11 — Race Condition on Shared File
   
 
     
@@ -1242,10 +1242,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-symptome-observable" class="md-nav__link">
+  <a href="#1-observable-symptoms" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Symptome observable
+        1. Observable Symptoms
       
     </span>
   </a>
@@ -1253,10 +1253,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-histoire-vecue-anonymisee" class="md-nav__link">
+  <a href="#2-field-story-anonymized" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Histoire vecue (anonymisee)
+        2. Field Story (anonymized)
       
     </span>
   </a>
@@ -1264,10 +1264,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-cause-racine-technique" class="md-nav__link">
+  <a href="#3-technical-root-cause" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Cause racine technique
+        3. Technical Root Cause
       
     </span>
   </a>
@@ -1287,10 +1287,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#41-detection-manuelle-audit-code" class="md-nav__link">
+  <a href="#41-manual-code-audit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.1 Detection manuelle (audit code)
+        4.1 Manual code audit
       
     </span>
   </a>
@@ -1298,10 +1298,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#42-detection-automatisee-cicd" class="md-nav__link">
+  <a href="#42-automated-cicd" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.2 Detection automatisee (CI/CD)
+        4.2 Automated CI/CD
       
     </span>
   </a>
@@ -1309,10 +1309,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#43-detection-runtime-production" class="md-nav__link">
+  <a href="#43-runtime-production" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.3 Detection runtime (production)
+        4.3 Runtime production
       
     </span>
   </a>
@@ -1325,22 +1325,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-correction" class="md-nav__link">
+  <a href="#5-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Correction
+        5. Fix
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. Correction">
+    <nav class="md-nav" aria-label="5. Fix">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#51-fix-immediat" class="md-nav__link">
+  <a href="#51-immediate-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.1 Fix immediat
+        5.1 Immediate fix
       
     </span>
   </a>
@@ -1348,10 +1348,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#52-fix-robuste" class="md-nav__link">
+  <a href="#52-robust-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.2 Fix robuste
+        5.2 Robust fix
       
     </span>
   </a>
@@ -1364,10 +1364,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-prevention-architecturale" class="md-nav__link">
+  <a href="#6-architectural-prevention" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. Prevention architecturale
+        6. Architectural Prevention
       
     </span>
   </a>
@@ -1375,10 +1375,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-anti-patterns-a-eviter" class="md-nav__link">
+  <a href="#7-anti-patterns-to-avoid" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. Anti-patterns a eviter
+        7. Anti-patterns to Avoid
       
     </span>
   </a>
@@ -1386,10 +1386,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-cas-limites-et-variantes" class="md-nav__link">
+  <a href="#8-edge-cases-and-variants" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8. Cas limites et variantes
+        8. Edge Cases and Variants
       
     </span>
   </a>
@@ -1397,10 +1397,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#9-checklist-daudit" class="md-nav__link">
+  <a href="#9-audit-checklist" class="md-nav__link">
     <span class="md-ellipsis">
       
-        9. Checklist d'audit
+        9. Audit Checklist
       
     </span>
   </a>
@@ -1408,10 +1408,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#10-pour-aller-plus-loin" class="md-nav__link">
+  <a href="#10-further-reading" class="md-nav__link">
     <span class="md-ellipsis">
       
-        10. Pour aller plus loin
+        10. Further Reading
       
     </span>
   </a>
@@ -1438,60 +1438,60 @@
   
 
 
-<h1 id="pattern-n10-survival-mode-deadlock">Pattern N°10 — Survival Mode Deadlock<a class="headerlink" href="#pattern-n10-survival-mode-deadlock" title="Permanent link">&para;</a></h1>
-<p><strong>Categorie :</strong> Filtrage &amp; Decisions
-<strong>Severite :</strong> Critical
-<strong>Frameworks impactes :</strong> LangChain / CrewAI / AutoGen / LangGraph / Custom
-<strong>Temps moyen de debogage si non detecte :</strong> 1 a 7 jours (le systeme est vivant mais inactif — la cause n'est pas cherchee tant que personne ne remarque l'absence d'actions)</p>
+<h1 id="pattern-10-survival-mode-deadlock">Pattern #10 — Survival Mode Deadlock<a class="headerlink" href="#pattern-10-survival-mode-deadlock" title="Permanent link">&para;</a></h1>
+<p><strong>Category:</strong> Filtering &amp; Decisions
+<strong>Severity:</strong> Critical
+<strong>Affected frameworks:</strong> LangChain / CrewAI / AutoGen / LangGraph / Custom
+<strong>Average debugging time if undetected:</strong> 1 to 7 days (the system is alive but idle — the root cause is not investigated as long as no one notices the absence of actions)</p>
 <hr />
-<h2 id="1-symptome-observable">1. Symptome observable<a class="headerlink" href="#1-symptome-observable" title="Permanent link">&para;</a></h2>
-<p>Le systeme est <strong>vivant mais ne fait rien</strong>. Les logs montrent que des evaluations ont lieu, des scores sont calcules, des decisions sont prises — mais la decision est toujours la meme : <strong>rejete</strong>. 100% des propositions sont vetoes. Aucune action n'est executee depuis des heures, des jours, voire des semaines.</p>
-<p>Le monitoring systeme est au vert : CPU normal, memoire normale, pas de crash, pas d'erreur. Le systeme tourne, il evalue, il decide — il decide juste de ne rien faire. C'est un deadlock qui ne ressemble pas a un deadlock car il n'y a ni thread bloque ni ressource verrouille. C'est un <strong>deadlock logique</strong> : le systeme est piege dans un etat ou il ne peut pas progresser.</p>
-<p>Le symptome le plus pervers : le cercle vicieux. Sans executer d'actions, le systeme ne genere pas de nouvelles donnees. Sans nouvelles donnees, les metriques ne s'ameliorent pas. Sans amelioration des metriques, le score reste en dessous du seuil. Le systeme est pris dans une boucle de retroaction negative dont il ne peut pas sortir seul.</p>
-<h2 id="2-histoire-vecue-anonymisee">2. Histoire vecue (anonymisee)<a class="headerlink" href="#2-histoire-vecue-anonymisee" title="Permanent link">&para;</a></h2>
-<p>Un systeme de decisions automatisees avait un mecanisme de confiance : chaque proposition recevait un score de 0 a 100, et seules les propositions avec un score &gt;= 50 etaient executees. Le seuil de 50 avait ete choisi arbitrairement ("la moitie, ca semble raisonnable").</p>
-<p>Apres un changement de conditions externes (un parametre de marche avait change), le score moyen des propositions est tombe de 55 a 42. Soudainement, 100% des propositions etaient en dessous du seuil. Le systeme est entre en "mode survie" — un etat prevu pour les periodes difficiles ou il est plus prudent de ne rien faire.</p>
-<p>Le probleme : le mode survie etait permanent. Sans executer d'actions, les metriques de performance stagnaient (pas de nouvelles donnees). Le module de scoring, base en partie sur les performances recentes, gardait un score bas. Le seuil, statique, ne bougeait pas. Le systeme est reste bloque pendant 4 jours avant que l'equipe ne remarque qu'aucune action n'avait ete executee.</p>
-<h2 id="3-cause-racine-technique">3. Cause racine technique<a class="headerlink" href="#3-cause-racine-technique" title="Permanent link">&para;</a></h2>
-<p>Le bug se produit quand un seuil de qualite <strong>statique</strong> est plus eleve que le score moyen que le systeme peut produire dans les conditions actuelles :</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Conditions normales:
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    Score moyen:  55/100
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    Seuil:        50/100
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    Taux d&#39;acceptation: ~70%     ← Systeme fonctionne
+<h2 id="1-observable-symptoms">1. Observable Symptoms<a class="headerlink" href="#1-observable-symptoms" title="Permanent link">&para;</a></h2>
+<p>The system is <strong>alive but does nothing</strong>. Logs show that evaluations are taking place, scores are being computed, decisions are being made — but the decision is always the same: <strong>rejected</strong>. 100% of proposals are vetoed. No action has been executed for hours, days, or even weeks.</p>
+<p>System monitoring is green: normal CPU, normal memory, no crashes, no errors. The system is running, evaluating, deciding — it just always decides to do nothing. This is a deadlock that does not look like a deadlock because there are no blocked threads and no locked resources. It is a <strong>logical deadlock</strong>: the system is trapped in a state from which it cannot progress.</p>
+<p>The most insidious symptom: the vicious cycle. Without executing actions, the system generates no new data. Without new data, metrics do not improve. Without improving metrics, the score remains below the threshold. The system is caught in a negative feedback loop it cannot escape on its own.</p>
+<h2 id="2-field-story-anonymized">2. Field Story (anonymized)<a class="headerlink" href="#2-field-story-anonymized" title="Permanent link">&para;</a></h2>
+<p>An automated decision system had a confidence mechanism: each proposal received a score from 0 to 100, and only proposals with a score &gt;= 50 were executed. The threshold of 50 had been chosen arbitrarily ("half sounds reasonable").</p>
+<p>After a change in external conditions (a market parameter had shifted), the average score of proposals dropped from 55 to 42. Suddenly, 100% of proposals were below the threshold. The system entered "survival mode" — a state designed for difficult periods where it is safer to do nothing.</p>
+<p>The problem: survival mode was permanent. Without executing actions, performance metrics stagnated (no new data). The scoring module, partially based on recent performance, kept producing low scores. The threshold, being static, did not move. The system remained stuck for 4 days before the team noticed that no action had been executed.</p>
+<h2 id="3-technical-root-cause">3. Technical Root Cause<a class="headerlink" href="#3-technical-root-cause" title="Permanent link">&para;</a></h2>
+<p>The bug occurs when a <strong>static</strong> quality threshold is higher than the average score the system can produce under current conditions:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Normal conditions:
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    Mean score:  55/100
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    Threshold:   50/100
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    Acceptance rate: ~70%     ← System functioning
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>Conditions degradees:
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    Score moyen:  42/100
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    Seuil:        50/100
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    Taux d&#39;acceptation: ~2%      ← Quasi-bloque
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>Degraded conditions:
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    Mean score:  42/100
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    Threshold:   50/100
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    Acceptance rate: ~2%      ← Near-deadlock
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>Conditions adverses:
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    Score moyen:  35/100
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    Seuil:        50/100
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    Taux d&#39;acceptation: 0%       ← DEADLOCK TOTAL
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>Adverse conditions:
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    Mean score:  35/100
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    Threshold:   50/100
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    Acceptance rate: 0%       ← TOTAL DEADLOCK
 </code></pre></div>
-<p>Le mecanisme de deadlock est un <strong>cercle vicieux a 4 etapes</strong> :</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>1. Conditions adverses → score moyen baisse
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>2. Score &lt; seuil → 100% des actions rejetees
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>3. 0 actions executees → 0 nouvelles donnees
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>4. 0 nouvelles donnees → metriques stagnent → score reste bas
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>→ Retour a l&#39;etape 2 : DEADLOCK PERMANENT
+<p>The deadlock mechanism is a <strong>4-step vicious cycle</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>1. Adverse conditions → mean score drops
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>2. Score &lt; threshold → 100% of actions rejected
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>3. 0 actions executed → 0 new data
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>4. 0 new data → metrics stagnate → score stays low
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>→ Back to step 2: PERMANENT DEADLOCK
 </code></pre></div>
-<p>Le probleme fondamental est que le seuil est <strong>decouple des conditions reelles</strong>. Un seuil de 50 a du sens quand les scores sont normalement entre 40 et 80. Il n'a plus de sens quand les scores sont entre 25 et 45 — un changement qui peut survenir a cause de facteurs completement exterieurs au systeme.</p>
+<p>The fundamental problem is that the threshold is <strong>decoupled from real-world conditions</strong>. A threshold of 50 makes sense when scores normally range between 40 and 80. It no longer makes sense when scores range between 25 and 45 — a shift that can occur due to factors entirely external to the system.</p>
 <h2 id="4-detection">4. Detection<a class="headerlink" href="#4-detection" title="Permanent link">&para;</a></h2>
-<h3 id="41-detection-manuelle-audit-code">4.1 Detection manuelle (audit code)<a class="headerlink" href="#41-detection-manuelle-audit-code" title="Permanent link">&para;</a></h3>
-<p>Chercher les seuils statiques dans les mecanismes de decision :</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Chercher les comparaisons de score/confiance avec des constantes</span>
+<h3 id="41-manual-code-audit">4.1 Manual code audit<a class="headerlink" href="#41-manual-code-audit" title="Permanent link">&para;</a></h3>
+<p>Search for static thresholds in decision mechanisms:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Search for score/confidence comparisons against constants</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>grep<span class="w"> </span>-rn<span class="w"> </span><span class="s2">&quot;confidence.*&gt;=\|score.*&gt;=\|threshold\|&gt;= 50\|&gt;= 0\.5&quot;</span><span class="w"> </span>--include<span class="o">=</span><span class="s2">&quot;*.py&quot;</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Chercher les mecanismes de veto/rejet</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Search for veto/rejection mechanisms</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>grep<span class="w"> </span>-rn<span class="w"> </span><span class="s2">&quot;VETO\|REJECT\|BLOCK\|DENIED\|rejected&quot;</span><span class="w"> </span>--include<span class="o">=</span><span class="s2">&quot;*.py&quot;</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># Chercher les compteurs de rejets (si le code en a)</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># Search for rejection counters (if the code tracks them)</span>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>grep<span class="w"> </span>-rn<span class="w"> </span><span class="s2">&quot;reject.*count\|veto.*count\|blocked.*count&quot;</span><span class="w"> </span>--include<span class="o">=</span><span class="s2">&quot;*.py&quot;</span>
 </code></pre></div>
-<p>Pour chaque seuil statique trouve, verifier : existe-t-il un mecanisme de fallback si le taux d'acceptation tombe a 0% ?</p>
-<h3 id="42-detection-automatisee-cicd">4.2 Detection automatisee (CI/CD)<a class="headerlink" href="#42-detection-automatisee-cicd" title="Permanent link">&para;</a></h3>
-<p>Tester que le systeme ne peut pas rester bloque indefiniment :</p>
+<p>For each static threshold found, verify: does a fallback mechanism exist if the acceptance rate drops to 0%?</p>
+<h3 id="42-automated-cicd">4.2 Automated CI/CD<a class="headerlink" href="#42-automated-cicd" title="Permanent link">&para;</a></h3>
+<p>Test that the system cannot remain stuck indefinitely:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_no_permanent_deadlock</span><span class="p">():</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulate worst-case scores and verify the system eventually acts.&quot;&quot;&quot;</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">scorer</span> <span class="o">=</span> <span class="n">MockScorer</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="mi">35</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># Scores always below 50</span>
@@ -1509,8 +1509,8 @@
 <a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>        <span class="s2">&quot;The gate has no fallback mechanism.&quot;</span>
 <a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>    <span class="p">)</span>
 </code></pre></div>
-<h3 id="43-detection-runtime-production">4.3 Detection runtime (production)<a class="headerlink" href="#43-detection-runtime-production" title="Permanent link">&para;</a></h3>
-<p>Monitorer le taux d'acceptation en temps reel et alerter si 0% pendant &gt; N cycles :</p>
+<h3 id="43-runtime-production">4.3 Runtime production<a class="headerlink" href="#43-runtime-production" title="Permanent link">&para;</a></h3>
+<p>Monitor the acceptance rate in real time and alert if 0% for more than N cycles:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
@@ -1540,9 +1540,9 @@
 <a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>
 <a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;deadlock&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;acceptance_rate&quot;</span><span class="p">:</span> <span class="n">acceptance_rate</span><span class="p">}</span>
 </code></pre></div>
-<h2 id="5-correction">5. Correction<a class="headerlink" href="#5-correction" title="Permanent link">&para;</a></h2>
-<h3 id="51-fix-immediat">5.1 Fix immediat<a class="headerlink" href="#51-fix-immediat" title="Permanent link">&para;</a></h3>
-<p>Ajouter un seuil minimum garanti : si le taux d'acceptation est 0% pendant N cycles, baisser temporairement le seuil :</p>
+<h2 id="5-fix">5. Fix<a class="headerlink" href="#5-fix" title="Permanent link">&para;</a></h2>
+<h3 id="51-immediate-fix">5.1 Immediate fix<a class="headerlink" href="#51-immediate-fix" title="Permanent link">&para;</a></h3>
+<p>Add a guaranteed minimum threshold: if the acceptance rate is 0% for N cycles, temporarily lower the threshold:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">EmergencyThresholdOverride</span><span class="p">:</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Temporarily lowers threshold when deadlocked.&quot;&quot;&quot;</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
@@ -1565,8 +1565,8 @@
 <a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">consecutive_rejects</span> <span class="o">+=</span> <span class="mi">1</span>
 <a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>            <span class="k">return</span> <span class="kc">False</span>
 </code></pre></div>
-<h3 id="52-fix-robuste">5.2 Fix robuste<a class="headerlink" href="#52-fix-robuste" title="Permanent link">&para;</a></h3>
-<p>Implementer un seuil adaptatif avec fenetre d'exploration :</p>
+<h3 id="52-robust-fix">5.2 Robust fix<a class="headerlink" href="#52-robust-fix" title="Permanent link">&para;</a></h3>
+<p>Implement an adaptive threshold with an exploration window:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">AdaptiveGate</span><span class="p">:</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="sd">    Three mechanisms to prevent deadlock:</span>
@@ -1614,50 +1614,50 @@
 <a id="__codelineno-6-45" name="__codelineno-6-45" href="#__codelineno-6-45"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">consecutive_rejects</span> <span class="o">+=</span> <span class="mi">1</span>
 <a id="__codelineno-6-46" name="__codelineno-6-46" href="#__codelineno-6-46"></a>            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;accepted&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="s2">&quot;below_threshold&quot;</span><span class="p">,</span> <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">}</span>
 </code></pre></div>
-<h2 id="6-prevention-architecturale">6. Prevention architecturale<a class="headerlink" href="#6-prevention-architecturale" title="Permanent link">&para;</a></h2>
-<p>Le principe fondamental : <strong>un systeme ne doit jamais pouvoir s'arreter indefiniment a cause d'un seuil de qualite</strong>. Meme dans le pire cas, il doit executer un minimum d'actions pour generer des donnees et pouvoir s'auto-corriger.</p>
-<p><strong>1. Seuil adaptatif, jamais statique.</strong> Le seuil doit s'ajuster aux conditions reelles. Si les scores moyens baissent, le seuil baisse aussi (avec un floor). Si les scores remontent, le seuil remonte.</p>
-<p><strong>2. Fenetre d'exploration obligatoire.</strong> Meme en mode ultra-conservateur, le systeme accepte au minimum 1 proposition sur N (ex: 1 sur 20). Cette "exploration" garantit que de nouvelles donnees sont generees, cassant le cercle vicieux.</p>
-<p><strong>3. Seuil par percentile au lieu d'absolu.</strong> Accepter le "top 10% des scores" au lieu de "score &gt;= 50". Un percentile garantit un taux d'acceptation minimum quel que soit le niveau absolu des scores.</p>
-<p><strong>4. Monitoring du taux d'acceptation comme KPI critique.</strong> Le taux d'acceptation doit etre monitore au meme titre que la latence ou le taux d'erreur. Un taux de 0% pendant &gt; 1h est une alerte P1.</p>
-<h2 id="7-anti-patterns-a-eviter">7. Anti-patterns a eviter<a class="headerlink" href="#7-anti-patterns-a-eviter" title="Permanent link">&para;</a></h2>
+<h2 id="6-architectural-prevention">6. Architectural Prevention<a class="headerlink" href="#6-architectural-prevention" title="Permanent link">&para;</a></h2>
+<p>The fundamental principle: <strong>a system must never be able to halt indefinitely due to a quality threshold</strong>. Even in the worst case, it must execute a minimum number of actions to generate data and be able to self-correct.</p>
+<p><strong>1. Adaptive threshold, never static.</strong> The threshold must adjust to real-world conditions. If mean scores drop, the threshold drops as well (with a floor). If scores recover, the threshold rises.</p>
+<p><strong>2. Mandatory exploration window.</strong> Even in ultra-conservative mode, the system accepts at least 1 proposal out of every N (e.g., 1 in 20). This "exploration" guarantees that new data is generated, breaking the vicious cycle.</p>
+<p><strong>3. Percentile-based threshold instead of absolute value.</strong> Accept the "top 10% of scores" rather than "score &gt;= 50". A percentile guarantees a minimum acceptance rate regardless of the absolute level of scores.</p>
+<p><strong>4. Acceptance rate monitored as a critical KPI.</strong> The acceptance rate must be monitored with the same priority as latency or error rate. A rate of 0% for more than 1 hour is a P1 alert.</p>
+<h2 id="7-anti-patterns-to-avoid">7. Anti-patterns to Avoid<a class="headerlink" href="#7-anti-patterns-to-avoid" title="Permanent link">&para;</a></h2>
 <ol>
 <li>
-<p><strong>Seuil statique sans mecanisme de fallback.</strong> <code>if score &gt;= 50</code> sans aucune alternative quand le score moyen est 42 = deadlock garanti.</p>
+<p><strong>Static threshold with no fallback mechanism.</strong> <code>if score &gt;= 50</code> with no alternative when the mean score is 42 = guaranteed deadlock.</p>
 </li>
 <li>
-<p><strong>"Mode survie" permanent.</strong> Un mode conservateur sans condition de sortie automatique. Si le mode survie necessite une intervention humaine pour en sortir, il est permanent en dehors des heures de bureau.</p>
+<p><strong>Permanent "survival mode".</strong> A conservative mode with no automatic exit condition. If survival mode requires human intervention to exit, it is permanent outside business hours.</p>
 </li>
 <li>
-<p><strong>Score base uniquement sur les performances recentes.</strong> Si le score depend des resultats des N dernieres actions et qu'il n'y a pas d'action, le score est base sur des donnees de plus en plus vieilles — il ne s'ameliorera jamais.</p>
+<p><strong>Score based solely on recent performance.</strong> If the score depends on the results of the last N actions and there are no actions, the score is based on increasingly stale data — it will never improve.</p>
 </li>
 <li>
-<p><strong>Pas de separation entre scoring et gating.</strong> Le module qui calcule le score ne devrait pas etre le meme que celui qui decide d'accepter ou non. Le gating peut avoir des regles d'exploration que le scoring ignore.</p>
+<p><strong>No separation between scoring and gating.</strong> The module that computes the score should not be the same one that decides whether to accept or reject. The gate can have exploration rules that the scorer knows nothing about.</p>
 </li>
 <li>
-<p><strong>Tester le gating uniquement avec des scores eleves.</strong> Si les tests ne simulent jamais un score moyen en dessous du seuil, le deadlock n'est jamais detecte avant la production.</p>
+<p><strong>Testing the gate only with high scores.</strong> If tests never simulate a mean score below the threshold, the deadlock is never detected before production.</p>
 </li>
 </ol>
-<h2 id="8-cas-limites-et-variantes">8. Cas limites et variantes<a class="headerlink" href="#8-cas-limites-et-variantes" title="Permanent link">&para;</a></h2>
-<p><strong>Variante 1 : Deadlock partiel.</strong> Le systeme accepte les actions de type A (score eleve) mais bloque 100% des actions de type B (score bas). Le monitoring global montre un taux d'acceptation &gt; 0% mais le type B est completement mort.</p>
-<p><strong>Variante 2 : Deadlock oscillant.</strong> Le seuil adaptatif descend, quelques actions passent, les metriques s'ameliorent marginalement, le seuil remonte, tout est re-bloque. Le systeme oscille entre "bloque" et "quasi-bloque" sans jamais se stabiliser.</p>
-<p><strong>Variante 3 : Deadlock par accumulation de vetos.</strong> Le systeme a 5 gates independantes (confiance, regime, pattern, timing, adversarial). Chacune a un taux d'acceptation de 80%. Le taux cumule est <code>0.8^5 = 32%</code>. Si une gate tombe a 60%, le cumule tombe a 0.6 * 0.8^4 = 24%. Ajouter une 6eme gate a 90% fait tomber le cumule a 22%. L'accumulation de gates "raisonnables" cree un filtre ultra-restrictif.</p>
-<p><strong>Variante 4 : Deadlock saisonnier.</strong> Le score depend de facteurs externes (conditions de marche, charge utilisateur, disponibilite API). Pendant certaines periodes (weekends, vacances, maintenance), les scores sont systematiquement bas. Le deadlock apparait le vendredi soir et se resout le lundi matin — sans que personne ne le remarque.</p>
-<h2 id="9-checklist-daudit">9. Checklist d'audit<a class="headerlink" href="#9-checklist-daudit" title="Permanent link">&para;</a></h2>
+<h2 id="8-edge-cases-and-variants">8. Edge Cases and Variants<a class="headerlink" href="#8-edge-cases-and-variants" title="Permanent link">&para;</a></h2>
+<p><strong>Variant 1: Partial deadlock.</strong> The system accepts actions of type A (high score) but blocks 100% of actions of type B (low score). Global monitoring shows an acceptance rate above 0%, but type B is completely dead.</p>
+<p><strong>Variant 2: Oscillating deadlock.</strong> The adaptive threshold decays, a few actions pass through, metrics improve marginally, the threshold rises again, everything is re-blocked. The system oscillates between "blocked" and "near-blocked" without ever stabilizing.</p>
+<p><strong>Variant 3: Deadlock by veto accumulation.</strong> The system has 5 independent gates (confidence, regime, pattern, timing, adversarial). Each has an acceptance rate of 80%. The combined rate is <code>0.8^5 = 32%</code>. If one gate drops to 60%, the combined rate drops to <code>0.6 * 0.8^4 = 24%</code>. Adding a 6th gate at 90% brings the combined rate down to 22%. The accumulation of "reasonable" gates creates an ultra-restrictive filter.</p>
+<p><strong>Variant 4: Seasonal deadlock.</strong> The score depends on external factors (market conditions, user load, API availability). During certain periods (weekends, holidays, maintenance windows), scores are systematically low. The deadlock appears on Friday evening and resolves on Monday morning — without anyone noticing.</p>
+<h2 id="9-audit-checklist">9. Audit Checklist<a class="headerlink" href="#9-audit-checklist" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[ ] Aucun seuil de decision n'est purement statique (chacun a un mecanisme adaptatif ou un fallback)</li>
-<li>[ ] Le taux d'acceptation est monitore et alerte si 0% pendant &gt; 1h</li>
-<li>[ ] Une fenetre d'exploration garantit au minimum 1 action par N cycles</li>
-<li>[ ] Le worst case est teste : que se passe-t-il si le score moyen est 50% en dessous du seuil ?</li>
-<li>[ ] Le deadlock detector est actif en production et envoie des alertes</li>
+<li>[ ] No decision threshold is purely static (each one has an adaptive mechanism or a fallback)</li>
+<li>[ ] The acceptance rate is monitored and alerts are fired if 0% for more than 1 hour</li>
+<li>[ ] An exploration window guarantees at least 1 action per N cycles</li>
+<li>[ ] The worst case is tested: what happens if the mean score is 50% below the threshold?</li>
+<li>[ ] The deadlock detector is active in production and sends alerts</li>
 </ul>
-<h2 id="10-pour-aller-plus-loin">10. Pour aller plus loin<a class="headerlink" href="#10-pour-aller-plus-loin" title="Permanent link">&para;</a></h2>
+<h2 id="10-further-reading">10. Further Reading<a class="headerlink" href="#10-further-reading" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Pattern court correspondant : <a href="https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-10">Pattern 10 — Survival Mode Deadlock</a></li>
-<li>Patterns connexes : #03 (Cascade de Penalites — une cascade qui baisse le score peut declencher le deadlock), #09 (Agent Infinite Loop — un agent qui boucle en cherchant un score impossible)</li>
-<li>Lectures recommandees :</li>
-<li>"Reinforcement Learning: An Introduction" (Sutton &amp; Barto), chapitre sur l'exploration vs exploitation — le dilemme fondamental que ce pattern illustre</li>
-<li>Documentation AutoGen sur les "termination conditions" — comment definir quand un agent doit s'arreter meme sans resultat parfait</li>
+<li>Corresponding short pattern: <a href="https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-10">Pattern 10 — Survival Mode Deadlock</a></li>
+<li>Related patterns: #03 (Penalty Cascade — a cascade that lowers the score can trigger the deadlock), #09 (Agent Infinite Loop — an agent that loops searching for an impossible score)</li>
+<li>Recommended reading:</li>
+<li>"Reinforcement Learning: An Introduction" (Sutton &amp; Barto), chapter on exploration vs. exploitation — the fundamental dilemma this pattern illustrates</li>
+<li>AutoGen documentation on "termination conditions" — how to define when an agent should stop even without a perfect result</li>
 </ul>
 
 

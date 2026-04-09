@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Catalogue technique des bugs critiques en architecture multi-agents IA, base sur 18 mois de production">
+        <meta name="description" content="Technical catalog of critical bugs in multi-agent AI systems architecture, based on 18 months of production">
       
       
         <meta name="author" content="Samuel Pages">
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#pattern-n04-multi-file-state-desync" class="md-skip">
+        <a href="#pattern-04-multi-file-state-desync" class="md-skip">
           Skip to content
         </a>
       
@@ -243,7 +243,7 @@
   <span class="md-ellipsis">
     
   
-    Accueil
+    Home
   
 
     
@@ -288,7 +288,7 @@
   <span class="md-ellipsis">
     
   
-    Temps & Synchronisation
+    Time & Synchronization
   
 
     
@@ -304,7 +304,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Temps & Synchronisation
+    Time & Synchronization
   
 
           </label>
@@ -377,7 +377,7 @@
   <span class="md-ellipsis">
     
   
-    Boucles & Orchestration
+    Loops & Orchestration
   
 
     
@@ -393,7 +393,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Boucles & Orchestration
+    Loops & Orchestration
   
 
           </label>
@@ -441,7 +441,7 @@
   <span class="md-ellipsis">
     
   
-    03 — Cascade de Penalites
+    03 — Penalty Cascade
   
 
     
@@ -522,7 +522,7 @@
   <span class="md-ellipsis">
     
   
-    Calculs & Etat
+    Computation & State
   
 
     
@@ -538,7 +538,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Calculs & Etat
+    Computation & State
   
 
           </label>
@@ -639,7 +639,7 @@
   <span class="md-ellipsis">
     
   
-    Securite & Secrets
+    Security & Secrets
   
 
     
@@ -655,7 +655,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Securite & Secrets
+    Security & Secrets
   
 
           </label>
@@ -817,10 +817,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-symptome-observable" class="md-nav__link">
+  <a href="#1-observable-symptoms" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Symptome observable
+        1. Observable Symptoms
       
     </span>
   </a>
@@ -828,10 +828,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-histoire-vecue-anonymisee" class="md-nav__link">
+  <a href="#2-field-story-anonymized" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Histoire vecue (anonymisee)
+        2. Field Story (anonymized)
       
     </span>
   </a>
@@ -839,10 +839,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-cause-racine-technique" class="md-nav__link">
+  <a href="#3-technical-root-cause" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Cause racine technique
+        3. Technical Root Cause
       
     </span>
   </a>
@@ -862,10 +862,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#41-detection-manuelle-audit-code" class="md-nav__link">
+  <a href="#41-manual-code-audit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.1 Detection manuelle (audit code)
+        4.1 Manual code audit
       
     </span>
   </a>
@@ -873,10 +873,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#42-detection-automatisee-cicd" class="md-nav__link">
+  <a href="#42-automated-cicd" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.2 Detection automatisee (CI/CD)
+        4.2 Automated CI/CD
       
     </span>
   </a>
@@ -884,10 +884,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#43-detection-runtime-production" class="md-nav__link">
+  <a href="#43-runtime-production" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.3 Detection runtime (production)
+        4.3 Runtime production
       
     </span>
   </a>
@@ -900,22 +900,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-correction" class="md-nav__link">
+  <a href="#5-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Correction
+        5. Fix
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. Correction">
+    <nav class="md-nav" aria-label="5. Fix">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#51-fix-immediat" class="md-nav__link">
+  <a href="#51-immediate-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.1 Fix immediat
+        5.1 Immediate fix
       
     </span>
   </a>
@@ -923,10 +923,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#52-fix-robuste" class="md-nav__link">
+  <a href="#52-robust-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.2 Fix robuste
+        5.2 Robust fix
       
     </span>
   </a>
@@ -939,10 +939,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-prevention-architecturale" class="md-nav__link">
+  <a href="#6-architectural-prevention" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. Prevention architecturale
+        6. Architectural Prevention
       
     </span>
   </a>
@@ -950,10 +950,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-anti-patterns-a-eviter" class="md-nav__link">
+  <a href="#7-anti-patterns-to-avoid" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. Anti-patterns a eviter
+        7. Anti-patterns to Avoid
       
     </span>
   </a>
@@ -961,10 +961,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-cas-limites-et-variantes" class="md-nav__link">
+  <a href="#8-edge-cases-and-variants" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8. Cas limites et variantes
+        8. Edge Cases and Variants
       
     </span>
   </a>
@@ -972,10 +972,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#9-checklist-daudit" class="md-nav__link">
+  <a href="#9-audit-checklist" class="md-nav__link">
     <span class="md-ellipsis">
       
-        9. Checklist d'audit
+        9. Audit Checklist
       
     </span>
   </a>
@@ -983,10 +983,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#10-pour-aller-plus-loin" class="md-nav__link">
+  <a href="#10-further-reading" class="md-nav__link">
     <span class="md-ellipsis">
       
-        10. Pour aller plus loin
+        10. Further Reading
       
     </span>
   </a>
@@ -1069,7 +1069,7 @@
   <span class="md-ellipsis">
     
   
-    Filtrage & Decisions
+    Filtering & Decisions
   
 
     
@@ -1085,7 +1085,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Filtrage & Decisions
+    Filtering & Decisions
   
 
           </label>
@@ -1158,7 +1158,7 @@
   <span class="md-ellipsis">
     
   
-    Gouvernance Multi-Agents
+    Multi-Agent Governance
   
 
     
@@ -1174,7 +1174,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Gouvernance Multi-Agents
+    Multi-Agent Governance
   
 
           </label>
@@ -1194,7 +1194,7 @@
   <span class="md-ellipsis">
     
   
-    11 — Race Condition Shared File
+    11 — Race Condition on Shared File
   
 
     
@@ -1242,10 +1242,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-symptome-observable" class="md-nav__link">
+  <a href="#1-observable-symptoms" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Symptome observable
+        1. Observable Symptoms
       
     </span>
   </a>
@@ -1253,10 +1253,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-histoire-vecue-anonymisee" class="md-nav__link">
+  <a href="#2-field-story-anonymized" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Histoire vecue (anonymisee)
+        2. Field Story (anonymized)
       
     </span>
   </a>
@@ -1264,10 +1264,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-cause-racine-technique" class="md-nav__link">
+  <a href="#3-technical-root-cause" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Cause racine technique
+        3. Technical Root Cause
       
     </span>
   </a>
@@ -1287,10 +1287,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#41-detection-manuelle-audit-code" class="md-nav__link">
+  <a href="#41-manual-code-audit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.1 Detection manuelle (audit code)
+        4.1 Manual code audit
       
     </span>
   </a>
@@ -1298,10 +1298,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#42-detection-automatisee-cicd" class="md-nav__link">
+  <a href="#42-automated-cicd" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.2 Detection automatisee (CI/CD)
+        4.2 Automated CI/CD
       
     </span>
   </a>
@@ -1309,10 +1309,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#43-detection-runtime-production" class="md-nav__link">
+  <a href="#43-runtime-production" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.3 Detection runtime (production)
+        4.3 Runtime production
       
     </span>
   </a>
@@ -1325,22 +1325,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-correction" class="md-nav__link">
+  <a href="#5-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Correction
+        5. Fix
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. Correction">
+    <nav class="md-nav" aria-label="5. Fix">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#51-fix-immediat" class="md-nav__link">
+  <a href="#51-immediate-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.1 Fix immediat
+        5.1 Immediate fix
       
     </span>
   </a>
@@ -1348,10 +1348,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#52-fix-robuste" class="md-nav__link">
+  <a href="#52-robust-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.2 Fix robuste
+        5.2 Robust fix
       
     </span>
   </a>
@@ -1364,10 +1364,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-prevention-architecturale" class="md-nav__link">
+  <a href="#6-architectural-prevention" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. Prevention architecturale
+        6. Architectural Prevention
       
     </span>
   </a>
@@ -1375,10 +1375,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-anti-patterns-a-eviter" class="md-nav__link">
+  <a href="#7-anti-patterns-to-avoid" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. Anti-patterns a eviter
+        7. Anti-patterns to Avoid
       
     </span>
   </a>
@@ -1386,10 +1386,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-cas-limites-et-variantes" class="md-nav__link">
+  <a href="#8-edge-cases-and-variants" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8. Cas limites et variantes
+        8. Edge Cases and Variants
       
     </span>
   </a>
@@ -1397,10 +1397,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#9-checklist-daudit" class="md-nav__link">
+  <a href="#9-audit-checklist" class="md-nav__link">
     <span class="md-ellipsis">
       
-        9. Checklist d'audit
+        9. Audit Checklist
       
     </span>
   </a>
@@ -1408,10 +1408,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#10-pour-aller-plus-loin" class="md-nav__link">
+  <a href="#10-further-reading" class="md-nav__link">
     <span class="md-ellipsis">
       
-        10. Pour aller plus loin
+        10. Further Reading
       
     </span>
   </a>
@@ -1438,50 +1438,50 @@
   
 
 
-<h1 id="pattern-n04-multi-file-state-desync">Pattern N°04 — Multi-File State Desync<a class="headerlink" href="#pattern-n04-multi-file-state-desync" title="Permanent link">&para;</a></h1>
-<p><strong>Categorie :</strong> I/O &amp; Persistence
-<strong>Severite :</strong> Critical
-<strong>Frameworks impactes :</strong> LangChain / CrewAI / AutoGen / LangGraph / Custom
-<strong>Temps moyen de debogage si non detecte :</strong> 3 a 15 jours (le bug est masque par le fait que chaque composant fonctionne correctement en isolation)</p>
+<h1 id="pattern-04-multi-file-state-desync">Pattern #04 — Multi-File State Desync<a class="headerlink" href="#pattern-04-multi-file-state-desync" title="Permanent link">&para;</a></h1>
+<p><strong>Category:</strong> I/O &amp; Persistence
+<strong>Severity:</strong> Critical
+<strong>Affected frameworks:</strong> LangChain / CrewAI / AutoGen / LangGraph / Custom
+<strong>Average debugging time if undetected:</strong> 3 to 15 days (the bug is masked by the fact that each component behaves correctly in isolation)</p>
 <hr />
-<h2 id="1-symptome-observable">1. Symptome observable<a class="headerlink" href="#1-symptome-observable" title="Permanent link">&para;</a></h2>
-<p>Trois composants du systeme donnent <strong>trois reponses differentes</strong> a la meme question. L'executeur pense que le systeme est en arret d'urgence. Le superviseur pense que tout fonctionne normalement. Le dashboard crash car un fichier d'etat n'existe pas.</p>
-<p>Le symptome le plus deroutant : chaque composant a <strong>raison selon sa propre source de donnees</strong>. L'executeur lit un fichier qui dit "ARRET". Le superviseur lit une config qui dit "actif". Le dashboard cherche un fichier JSON qui n'a jamais ete cree. Aucun ne ment — ils lisent simplement des sources differentes qui ne sont pas synchronisees.</p>
-<p>En consequences indirectes : des commandes sont envoyees mais jamais executees (le superviseur envoie, l'executeur bloque), des alertes se declenchent sans raison (le dashboard voit un etat incoherent), et le developpeur passe des heures a chercher un bug qui n'est pas dans le code mais dans la <strong>topologie des donnees</strong>.</p>
-<h2 id="2-histoire-vecue-anonymisee">2. Histoire vecue (anonymisee)<a class="headerlink" href="#2-histoire-vecue-anonymisee" title="Permanent link">&para;</a></h2>
-<p>Un systeme multi-agents avait un mecanisme d'arret d'urgence ("killswitch") dont l'etat etait stocke en 3 endroits :
-- Un fichier texte simple (<code>emergency.txt</code>) ecrit par l'executeur
-- Un fichier JSON structure (<code>emergency_state.json</code>) pour le dashboard
-- Un champ dans la config partagee (<code>config.json → emergency_active: false</code>) pour le superviseur</p>
-<p>Lors d'un incident 10 jours plus tot, l'executeur avait active l'arret d'urgence en ecrivant "ACTIVE" dans le fichier texte. L'incident avait ete resolu manuellement en changeant <code>emergency_active: false</code> dans la config. Mais personne n'avait pense a mettre a jour le fichier texte.</p>
-<p>Resultat : 10 jours plus tard, l'executeur lisait toujours "ACTIVE" dans son fichier et refusait silencieusement les commandes du superviseur. Le superviseur, lui, voyait <code>emergency_active: false</code> et continuait d'envoyer des commandes. Il a fallu 3 heures de debugging pour comprendre que le probleme n'etait pas dans le code mais dans un fichier texte stale de 10 jours.</p>
-<h2 id="3-cause-racine-technique">3. Cause racine technique<a class="headerlink" href="#3-cause-racine-technique" title="Permanent link">&para;</a></h2>
-<p>L'etat a ete <strong>duplique progressivement</strong> au fil du developpement du systeme. Chaque nouvelle fonctionnalite a ajoute sa propre representation de l'etat sans synchroniser les precedentes :</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>V1 (mois 1) : executeur ecrit emergency.txt           ← format texte
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>V2 (mois 3) : superviseur utilise config.json          ← champ JSON
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>V3 (mois 6) : dashboard lit emergency_state.json       ← JSON structure
+<h2 id="1-observable-symptoms">1. Observable Symptoms<a class="headerlink" href="#1-observable-symptoms" title="Permanent link">&para;</a></h2>
+<p>Three system components give <strong>three different answers</strong> to the same question. The executor believes the system is in emergency shutdown. The supervisor believes everything is running normally. The dashboard crashes because a state file does not exist.</p>
+<p>The most confusing symptom: each component is <strong>correct according to its own data source</strong>. The executor reads a file that says "SHUTDOWN". The supervisor reads a config that says "active". The dashboard looks for a JSON file that was never created. None of them is lying — they are simply reading different sources that are not synchronized.</p>
+<p>Indirect consequences: commands are sent but never executed (the supervisor sends, the executor blocks), alerts fire without cause (the dashboard sees an inconsistent state), and the developer spends hours looking for a bug that lives not in the code but in the <strong>data topology</strong>.</p>
+<h2 id="2-field-story-anonymized">2. Field Story (anonymized)<a class="headerlink" href="#2-field-story-anonymized" title="Permanent link">&para;</a></h2>
+<p>A multi-agent system had an emergency shutdown mechanism ("killswitch") whose state was stored in 3 places:
+- A plain text file (<code>emergency.txt</code>) written by the executor
+- A structured JSON file (<code>emergency_state.json</code>) for the dashboard
+- A field in the shared config (<code>config.json → emergency_active: false</code>) for the supervisor</p>
+<p>During an incident 10 days earlier, the executor had activated the emergency shutdown by writing "ACTIVE" to the text file. The incident was resolved manually by changing <code>emergency_active: false</code> in the config. But nobody thought to update the text file.</p>
+<p>Result: 10 days later, the executor was still reading "ACTIVE" from its file and silently rejecting commands from the supervisor. The supervisor, seeing <code>emergency_active: false</code>, kept sending commands. It took 3 hours of debugging to understand that the problem was not in the code but in a stale text file that was 10 days old.</p>
+<h2 id="3-technical-root-cause">3. Technical Root Cause<a class="headerlink" href="#3-technical-root-cause" title="Permanent link">&para;</a></h2>
+<p>State was <strong>progressively duplicated</strong> as the system evolved. Each new feature added its own representation of the state without synchronizing the existing ones:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>V1 (month 1) : executor writes emergency.txt           ← plain text format
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>V2 (month 3) : supervisor uses config.json              ← JSON field
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>V3 (month 6) : dashboard reads emergency_state.json     ← structured JSON
 </code></pre></div>
-<p>A aucun moment ces 3 fichiers ne sont synchronises. Chaque composant ecrit dans "son" fichier et ne lit que celui-la. Le resultat est 3 sources de verite pour un seul etat :</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>emergency.txt          → &quot;ACTIVE&quot;    (ecrit il y a 10 jours, jamais nettoye)
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>emergency_state.json   → absent      (jamais cree)
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>config.json            → false       (mis a jour manuellement)
+<p>At no point are these 3 files synchronized. Each component writes to "its own" file and reads only that one. The result is 3 sources of truth for a single state:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>emergency.txt          → &quot;ACTIVE&quot;    (written 10 days ago, never cleaned up)
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>emergency_state.json   → absent      (never created)
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>config.json            → false       (updated manually)
 </code></pre></div>
-<p>Le probleme fondamental est l'absence de <strong>Single Source of Truth</strong> (SSOT). Quand un etat critique est stocke a N endroits, il faut N operations synchronisees pour le modifier. En pratique, seules 1 ou 2 operations sont faites, et les N-1 ou N-2 restantes divergent silencieusement.</p>
+<p>The fundamental problem is the absence of a <strong>Single Source of Truth</strong> (SSOT). When a critical state is stored in N places, N synchronized operations are required to modify it. In practice, only 1 or 2 operations are performed, and the remaining N-1 or N-2 copies silently diverge.</p>
 <h2 id="4-detection">4. Detection<a class="headerlink" href="#4-detection" title="Permanent link">&para;</a></h2>
-<h3 id="41-detection-manuelle-audit-code">4.1 Detection manuelle (audit code)<a class="headerlink" href="#41-detection-manuelle-audit-code" title="Permanent link">&para;</a></h3>
-<p>Pour chaque etat critique du systeme, lister toutes les sources qui le stockent :</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Chercher toutes les references a un etat specifique (ex: &quot;emergency&quot;, &quot;killswitch&quot;)</span>
+<h3 id="41-manual-code-audit">4.1 Manual code audit<a class="headerlink" href="#41-manual-code-audit" title="Permanent link">&para;</a></h3>
+<p>For each critical state in the system, list every source that stores it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Find all references to a specific state (e.g., &quot;emergency&quot;, &quot;killswitch&quot;)</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>grep<span class="w"> </span>-rn<span class="w"> </span><span class="s2">&quot;emergency\|killswitch\|shutdown&quot;</span><span class="w"> </span>--include<span class="o">=</span><span class="s2">&quot;*.py&quot;</span><span class="w"> </span>--include<span class="o">=</span><span class="s2">&quot;*.json&quot;</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Compter les fichiers qui ECRIVENT cet etat</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Count files that WRITE this state</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>grep<span class="w"> </span>-rln<span class="w"> </span><span class="s2">&quot;emergency.*=\|write.*emergency\|emergency.*write&quot;</span><span class="w"> </span>--include<span class="o">=</span><span class="s2">&quot;*.py&quot;</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># Compter les fichiers qui LISENT cet etat</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># Count files that READ this state</span>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>grep<span class="w"> </span>-rln<span class="w"> </span><span class="s2">&quot;read.*emergency\|emergency.*get\|load.*emergency&quot;</span><span class="w"> </span>--include<span class="o">=</span><span class="s2">&quot;*.py&quot;</span>
 </code></pre></div>
-<p>Si le nombre de writers &gt; 1 ou le nombre de sources &gt; 1, c'est un candidat pour la desync.</p>
-<h3 id="42-detection-automatisee-cicd">4.2 Detection automatisee (CI/CD)<a class="headerlink" href="#42-detection-automatisee-cicd" title="Permanent link">&para;</a></h3>
-<p>Documenter les etats critiques dans un fichier de referentiel et verifier en CI que chaque etat n'a qu'une seule source d'ecriture :</p>
+<p>If the number of writers &gt; 1 or the number of sources &gt; 1, it is a candidate for desync.</p>
+<h3 id="42-automated-cicd">4.2 Automated CI/CD<a class="headerlink" href="#42-automated-cicd" title="Permanent link">&para;</a></h3>
+<p>Document critical states in a reference file and verify in CI that each state has exactly one write source:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># test_single_source_of_truth.py</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">CRITICAL_STATES</span> <span class="o">=</span> <span class="p">{</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="s2">&quot;emergency_active&quot;</span><span class="p">:</span> <span class="p">{</span>
@@ -1508,8 +1508,8 @@
 <a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a>            <span class="sa">f</span><span class="s2">&quot;Expected max </span><span class="si">{</span><span class="n">spec</span><span class="p">[</span><span class="s1">&#39;expected_writers&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
 <a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>        <span class="p">)</span>
 </code></pre></div>
-<h3 id="43-detection-runtime-production">4.3 Detection runtime (production)<a class="headerlink" href="#43-detection-runtime-production" title="Permanent link">&para;</a></h3>
-<p>A chaque cycle, comparer les valeurs de toutes les copies d'un meme etat :</p>
+<h3 id="43-runtime-production">4.3 Runtime production<a class="headerlink" href="#43-runtime-production" title="Permanent link">&para;</a></h3>
+<p>At each cycle, compare the values of all copies of the same state:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span><span class="p">,</span> <span class="n">timedelta</span>
@@ -1538,9 +1538,9 @@
 <a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>
 <a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>    <span class="k">return</span> <span class="n">alerts</span>
 </code></pre></div>
-<h2 id="5-correction">5. Correction<a class="headerlink" href="#5-correction" title="Permanent link">&para;</a></h2>
-<h3 id="51-fix-immediat">5.1 Fix immediat<a class="headerlink" href="#51-fix-immediat" title="Permanent link">&para;</a></h3>
-<p>Synchroniser toutes les copies depuis la source primaire :</p>
+<h2 id="5-fix">5. Fix<a class="headerlink" href="#5-fix" title="Permanent link">&para;</a></h2>
+<h3 id="51-immediate-fix">5.1 Immediate fix<a class="headerlink" href="#51-immediate-fix" title="Permanent link">&para;</a></h3>
+<p>Synchronize all copies from the primary source:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">sync_emergency_state</span><span class="p">(</span><span class="n">primary_value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Force all copies to match the primary source.&quot;&quot;&quot;</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="c1"># Primary</span>
@@ -1555,8 +1555,8 @@
 <a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;data/config.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 <a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="52-fix-robuste">5.2 Fix robuste<a class="headerlink" href="#52-fix-robuste" title="Permanent link">&para;</a></h3>
-<p>Implementer un <strong>StateManager</strong> qui est la seule facon de lire et modifier un etat. Il ecrit dans toutes les copies a chaque modification et lit depuis la source primaire uniquement :</p>
+<h3 id="52-robust-fix">5.2 Robust fix<a class="headerlink" href="#52-robust-fix" title="Permanent link">&para;</a></h3>
+<p>Implement a <strong>StateManager</strong> that is the sole interface for reading and modifying state. It writes to all copies on every update and reads exclusively from the primary source:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
@@ -1624,48 +1624,48 @@
 <a id="__codelineno-6-65" name="__codelineno-6-65" href="#__codelineno-6-65"></a>                <span class="n">issues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">copy</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">copy_value</span><span class="si">}</span><span class="s2"> vs primary </span><span class="si">{</span><span class="n">primary_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <a id="__codelineno-6-66" name="__codelineno-6-66" href="#__codelineno-6-66"></a>        <span class="k">return</span> <span class="n">issues</span>
 </code></pre></div>
-<h2 id="6-prevention-architecturale">6. Prevention architecturale<a class="headerlink" href="#6-prevention-architecturale" title="Permanent link">&para;</a></h2>
-<p>Le principe fondateur est le <strong>Single Source of Truth</strong> : chaque etat critique n'a qu'<strong>une seule source d'ecriture</strong>. Les autres representations sont des copies read-only synchronisees automatiquement.</p>
-<p>En pratique, cela signifie migrer les etats critiques vers une base de donnees (SQLite pour un systeme local, PostgreSQL pour un systeme distribue) et eliminer les fichiers texte/JSON comme stockage d'etat. Les fichiers restent pour la compatibilite avec des composants legacy, mais ils sont generes par le StateManager et ne sont jamais lus comme source de verite.</p>
-<p>Un sync periodique (toutes les 60 secondes) re-aligne les copies legacy avec la source primaire. Meme si un composant ecrit directement dans un fichier legacy (contournant le StateManager), le sync suivant ecrasera sa modification. C'est brutal mais efficace.</p>
-<h2 id="7-anti-patterns-a-eviter">7. Anti-patterns a eviter<a class="headerlink" href="#7-anti-patterns-a-eviter" title="Permanent link">&para;</a></h2>
+<h2 id="6-architectural-prevention">6. Architectural Prevention<a class="headerlink" href="#6-architectural-prevention" title="Permanent link">&para;</a></h2>
+<p>The founding principle is <strong>Single Source of Truth</strong>: each critical state has exactly <strong>one write source</strong>. All other representations are read-only copies synchronized automatically.</p>
+<p>In practice, this means migrating critical states to a database (SQLite for a local system, PostgreSQL for a distributed system) and eliminating text/JSON files as state storage. Files may remain for compatibility with legacy components, but they are generated by the StateManager and are never read as a source of truth.</p>
+<p>A periodic sync (every 60 seconds) re-aligns legacy copies with the primary source. Even if a component writes directly to a legacy file (bypassing the StateManager), the next sync will overwrite its change. This is blunt but effective.</p>
+<h2 id="7-anti-patterns-to-avoid">7. Anti-patterns to Avoid<a class="headerlink" href="#7-anti-patterns-to-avoid" title="Permanent link">&para;</a></h2>
 <ol>
 <li>
-<p><strong>Ajouter un nouveau fichier d'etat sans synchroniser les existants.</strong> Chaque nouvelle representation d'un etat existant doit etre geree par le StateManager ou supprimee.</p>
+<p><strong>Adding a new state file without synchronizing existing ones.</strong> Every new representation of an existing state must be managed by the StateManager or removed.</p>
 </li>
 <li>
-<p><strong>Resoudre un incident en modifiant manuellement un fichier.</strong> Si on change <code>config.json</code> a la main mais pas <code>emergency.txt</code>, on cree une desync. Toujours passer par un script ou le StateManager.</p>
+<p><strong>Resolving an incident by manually editing a file.</strong> If <code>config.json</code> is changed by hand but <code>emergency.txt</code> is not, a desync is created. Always go through a script or the StateManager.</p>
 </li>
 <li>
-<p><strong>Lire un fichier sans verifier sa fraicheur.</strong> Un fichier qui n'a pas ete modifie depuis 10 jours est probablement stale. Chaque fichier d'etat devrait contenir un timestamp <code>last_synced</code>.</p>
+<p><strong>Reading a file without checking its freshness.</strong> A file that has not been modified in 10 days is likely stale. Every state file should contain a <code>last_synced</code> timestamp.</p>
 </li>
 <li>
-<p><strong>Supposer que l'absence de fichier = etat par defaut.</strong> Un fichier absent peut signifier "jamais cree" (etat initial) ou "supprime par accident" (corruption). Gerer explicitement les deux cas.</p>
+<p><strong>Assuming that a missing file equals the default state.</strong> A missing file can mean "never created" (initial state) or "accidentally deleted" (corruption). Handle both cases explicitly.</p>
 </li>
 <li>
-<p><strong>Pas d'audit de coherence periodique.</strong> Meme avec un StateManager, les fichiers peuvent diverger (ecriture directe, crash mid-sync). Un audit toutes les minutes qui compare les copies detecte les divergences en &lt; 60 secondes.</p>
+<p><strong>No periodic consistency audit.</strong> Even with a StateManager, files can diverge (direct writes, crash mid-sync). An audit every minute that compares copies detects divergences in under 60 seconds.</p>
 </li>
 </ol>
-<h2 id="8-cas-limites-et-variantes">8. Cas limites et variantes<a class="headerlink" href="#8-cas-limites-et-variantes" title="Permanent link">&para;</a></h2>
-<p><strong>Variante 1 : Config partagee entre agents.</strong> Un fichier <code>config.json</code> lu par 4 agents, chacun modifiant des sections differentes. Sans lock, l'agent A peut ecraser les modifications de l'agent B. C'est une desync intra-fichier, pas inter-fichier.</p>
-<p><strong>Variante 2 : Cache applicatif desynchronise.</strong> L'etat est correct dans la DB mais le cache en memoire d'un agent contient l'ancienne valeur. Le cache n'est pas invalide apres une modification. Solution : TTL court sur le cache ou invalidation explicite.</p>
-<p><strong>Variante 3 : Etat distribue entre machines.</strong> Deux instances du meme agent tournent sur deux VPS. Chacune a sa propre copie locale de l'etat. Apres une modification sur l'instance A, l'instance B garde l'ancienne valeur. Solution : stockage centralise (Redis, Consul, ou DB).</p>
-<p><strong>Variante 4 : Fichier d'etat stale apres crash.</strong> Le StateManager ecrit dans le fichier primaire, crashe avant de synchroniser les copies legacy. Au restart, les copies sont desynchronisees. Solution : le sync doit etre la premiere action au boot, avant toute lecture.</p>
-<h2 id="9-checklist-daudit">9. Checklist d'audit<a class="headerlink" href="#9-checklist-daudit" title="Permanent link">&para;</a></h2>
+<h2 id="8-edge-cases-and-variants">8. Edge Cases and Variants<a class="headerlink" href="#8-edge-cases-and-variants" title="Permanent link">&para;</a></h2>
+<p><strong>Variant 1: Config shared between agents.</strong> A <code>config.json</code> file read by 4 agents, each modifying different sections. Without a lock, agent A can overwrite agent B's changes. This is an intra-file desync, not an inter-file one.</p>
+<p><strong>Variant 2: Application cache out of sync.</strong> The state is correct in the DB but an agent's in-memory cache holds the old value. The cache is not invalidated after a modification. Solution: short TTL on the cache or explicit invalidation.</p>
+<p><strong>Variant 3: Distributed state across machines.</strong> Two instances of the same agent run on two VPS. Each has its own local copy of the state. After a modification on instance A, instance B retains the old value. Solution: centralized storage (Redis, Consul, or a DB).</p>
+<p><strong>Variant 4: Stale state file after a crash.</strong> The StateManager writes to the primary file, then crashes before synchronizing the legacy copies. On restart, the copies are desynchronized. Solution: the sync must be the first action at boot, before any read.</p>
+<h2 id="9-audit-checklist">9. Audit Checklist<a class="headerlink" href="#9-audit-checklist" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[ ] Chaque etat critique a une source primaire designee et documentee</li>
-<li>[ ] Aucun composant ne lit un fichier d'etat legacy directement (tous passent par le StateManager)</li>
-<li>[ ] Un sync periodique re-aligne les copies legacy avec la source primaire</li>
-<li>[ ] Chaque fichier d'etat contient un timestamp <code>last_synced</code> ou <code>last_modified</code></li>
-<li>[ ] Un audit de coherence compare toutes les copies a chaque cycle et alerte si divergence</li>
+<li>[ ] Each critical state has a designated and documented primary source</li>
+<li>[ ] No component reads a legacy state file directly (all go through the StateManager)</li>
+<li>[ ] A periodic sync re-aligns legacy copies with the primary source</li>
+<li>[ ] Each state file contains a <code>last_synced</code> or <code>last_modified</code> timestamp</li>
+<li>[ ] A consistency audit compares all copies at every cycle and alerts on divergence</li>
 </ul>
-<h2 id="10-pour-aller-plus-loin">10. Pour aller plus loin<a class="headerlink" href="#10-pour-aller-plus-loin" title="Permanent link">&para;</a></h2>
+<h2 id="10-further-reading">10. Further Reading<a class="headerlink" href="#10-further-reading" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Pattern court correspondant : <a href="https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-04">Pattern 04 — Multi-File State Desync</a></li>
-<li>Patterns connexes : #11 (Race Condition on Shared File — ecriture concurrente dans le meme fichier), #08 (Data Pipeline Freeze — un fichier stale peut etre un symptome de desync), #01 (Timezone Mismatch — les timestamps dans les fichiers desynchronises peuvent etre en timezones differentes)</li>
-<li>Lectures recommandees :</li>
-<li>"Designing Data-Intensive Applications" (Martin Kleppmann), chapitre 5 sur la replication et la consistance</li>
-<li>Documentation HashiCorp Consul sur le consensus distribue — les memes problemes a plus grande echelle</li>
+<li>Short pattern: <a href="https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-04">Pattern 04 — Multi-File State Desync</a></li>
+<li>Related patterns: #11 (Race Condition on Shared File — concurrent writes to the same file), #08 (Data Pipeline Freeze — a stale file can be a symptom of desync), #01 (Timezone Mismatch — timestamps in desynchronized files may be in different timezones)</li>
+<li>Recommended reading:</li>
+<li>"Designing Data-Intensive Applications" (Martin Kleppmann), chapter 5 on replication and consistency</li>
+<li>HashiCorp Consul documentation on distributed consensus — the same problems at a larger scale</li>
 </ul>
 
 

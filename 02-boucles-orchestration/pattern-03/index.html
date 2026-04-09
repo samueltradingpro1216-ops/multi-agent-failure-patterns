@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Catalogue technique des bugs critiques en architecture multi-agents IA, base sur 18 mois de production">
+        <meta name="description" content="Technical catalog of critical bugs in multi-agent AI systems architecture, based on 18 months of production">
       
       
         <meta name="author" content="Samuel Pages">
@@ -29,7 +29,7 @@
     
     
       
-        <title>03 — Cascade de Penalites - Multi-Agent Failure Patterns</title>
+        <title>03 — Penalty Cascade - Multi-Agent Failure Patterns</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#pattern-n03-cascade-de-penalites-effet-multiplicatif" class="md-skip">
+        <a href="#pattern-03-penalty-cascade-multiplicative-effect" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              03 — Cascade de Penalites
+              03 — Penalty Cascade
             
           </span>
         </div>
@@ -243,7 +243,7 @@
   <span class="md-ellipsis">
     
   
-    Accueil
+    Home
   
 
     
@@ -288,7 +288,7 @@
   <span class="md-ellipsis">
     
   
-    Temps & Synchronisation
+    Time & Synchronization
   
 
     
@@ -304,7 +304,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Temps & Synchronisation
+    Time & Synchronization
   
 
           </label>
@@ -377,7 +377,7 @@
   <span class="md-ellipsis">
     
   
-    Boucles & Orchestration
+    Loops & Orchestration
   
 
     
@@ -393,7 +393,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Boucles & Orchestration
+    Loops & Orchestration
   
 
           </label>
@@ -450,7 +450,7 @@
   <span class="md-ellipsis">
     
   
-    03 — Cascade de Penalites
+    03 — Penalty Cascade
   
 
     
@@ -468,7 +468,7 @@
   <span class="md-ellipsis">
     
   
-    03 — Cascade de Penalites
+    03 — Penalty Cascade
   
 
     
@@ -494,10 +494,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-symptome-observable" class="md-nav__link">
+  <a href="#1-observable-symptoms" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Symptome observable
+        1. Observable Symptoms
       
     </span>
   </a>
@@ -505,10 +505,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-histoire-vecue-anonymisee" class="md-nav__link">
+  <a href="#2-field-story-anonymized" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Histoire vecue (anonymisee)
+        2. Field Story (anonymized)
       
     </span>
   </a>
@@ -516,10 +516,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-cause-racine-technique" class="md-nav__link">
+  <a href="#3-technical-root-cause" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Cause racine technique
+        3. Technical Root Cause
       
     </span>
   </a>
@@ -539,10 +539,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#41-detection-manuelle-audit-code" class="md-nav__link">
+  <a href="#41-manual-code-audit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.1 Detection manuelle (audit code)
+        4.1 Manual code audit
       
     </span>
   </a>
@@ -550,10 +550,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#42-detection-automatisee-cicd" class="md-nav__link">
+  <a href="#42-automated-cicd" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.2 Detection automatisee (CI/CD)
+        4.2 Automated CI/CD
       
     </span>
   </a>
@@ -561,10 +561,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#43-detection-runtime-production" class="md-nav__link">
+  <a href="#43-runtime-production" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.3 Detection runtime (production)
+        4.3 Runtime production
       
     </span>
   </a>
@@ -577,22 +577,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-correction" class="md-nav__link">
+  <a href="#5-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Correction
+        5. Fix
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. Correction">
+    <nav class="md-nav" aria-label="5. Fix">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#51-fix-immediat" class="md-nav__link">
+  <a href="#51-immediate-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.1 Fix immediat
+        5.1 Immediate fix
       
     </span>
   </a>
@@ -600,10 +600,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#52-fix-robuste" class="md-nav__link">
+  <a href="#52-robust-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.2 Fix robuste
+        5.2 Robust fix
       
     </span>
   </a>
@@ -616,10 +616,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-prevention-architecturale" class="md-nav__link">
+  <a href="#6-architectural-prevention" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. Prevention architecturale
+        6. Architectural Prevention
       
     </span>
   </a>
@@ -627,10 +627,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-anti-patterns-a-eviter" class="md-nav__link">
+  <a href="#7-anti-patterns-to-avoid" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. Anti-patterns a eviter
+        7. Anti-patterns to Avoid
       
     </span>
   </a>
@@ -638,10 +638,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-cas-limites-et-variantes" class="md-nav__link">
+  <a href="#8-edge-cases-and-variants" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8. Cas limites et variantes
+        8. Edge Cases and Variants
       
     </span>
   </a>
@@ -649,10 +649,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#9-checklist-daudit" class="md-nav__link">
+  <a href="#9-audit-checklist" class="md-nav__link">
     <span class="md-ellipsis">
       
-        9. Checklist d'audit
+        9. Audit Checklist
       
     </span>
   </a>
@@ -660,10 +660,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#10-pour-aller-plus-loin" class="md-nav__link">
+  <a href="#10-further-reading" class="md-nav__link">
     <span class="md-ellipsis">
       
-        10. Pour aller plus loin
+        10. Further Reading
       
     </span>
   </a>
@@ -746,7 +746,7 @@
   <span class="md-ellipsis">
     
   
-    Calculs & Etat
+    Computation & State
   
 
     
@@ -762,7 +762,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Calculs & Etat
+    Computation & State
   
 
           </label>
@@ -863,7 +863,7 @@
   <span class="md-ellipsis">
     
   
-    Securite & Secrets
+    Security & Secrets
   
 
     
@@ -879,7 +879,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Securite & Secrets
+    Security & Secrets
   
 
           </label>
@@ -1069,7 +1069,7 @@
   <span class="md-ellipsis">
     
   
-    Filtrage & Decisions
+    Filtering & Decisions
   
 
     
@@ -1085,7 +1085,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Filtrage & Decisions
+    Filtering & Decisions
   
 
           </label>
@@ -1158,7 +1158,7 @@
   <span class="md-ellipsis">
     
   
-    Gouvernance Multi-Agents
+    Multi-Agent Governance
   
 
     
@@ -1174,7 +1174,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Gouvernance Multi-Agents
+    Multi-Agent Governance
   
 
           </label>
@@ -1194,7 +1194,7 @@
   <span class="md-ellipsis">
     
   
-    11 — Race Condition Shared File
+    11 — Race Condition on Shared File
   
 
     
@@ -1242,10 +1242,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-symptome-observable" class="md-nav__link">
+  <a href="#1-observable-symptoms" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Symptome observable
+        1. Observable Symptoms
       
     </span>
   </a>
@@ -1253,10 +1253,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-histoire-vecue-anonymisee" class="md-nav__link">
+  <a href="#2-field-story-anonymized" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Histoire vecue (anonymisee)
+        2. Field Story (anonymized)
       
     </span>
   </a>
@@ -1264,10 +1264,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-cause-racine-technique" class="md-nav__link">
+  <a href="#3-technical-root-cause" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Cause racine technique
+        3. Technical Root Cause
       
     </span>
   </a>
@@ -1287,10 +1287,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#41-detection-manuelle-audit-code" class="md-nav__link">
+  <a href="#41-manual-code-audit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.1 Detection manuelle (audit code)
+        4.1 Manual code audit
       
     </span>
   </a>
@@ -1298,10 +1298,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#42-detection-automatisee-cicd" class="md-nav__link">
+  <a href="#42-automated-cicd" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.2 Detection automatisee (CI/CD)
+        4.2 Automated CI/CD
       
     </span>
   </a>
@@ -1309,10 +1309,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#43-detection-runtime-production" class="md-nav__link">
+  <a href="#43-runtime-production" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.3 Detection runtime (production)
+        4.3 Runtime production
       
     </span>
   </a>
@@ -1325,22 +1325,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-correction" class="md-nav__link">
+  <a href="#5-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Correction
+        5. Fix
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. Correction">
+    <nav class="md-nav" aria-label="5. Fix">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#51-fix-immediat" class="md-nav__link">
+  <a href="#51-immediate-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.1 Fix immediat
+        5.1 Immediate fix
       
     </span>
   </a>
@@ -1348,10 +1348,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#52-fix-robuste" class="md-nav__link">
+  <a href="#52-robust-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.2 Fix robuste
+        5.2 Robust fix
       
     </span>
   </a>
@@ -1364,10 +1364,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-prevention-architecturale" class="md-nav__link">
+  <a href="#6-architectural-prevention" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. Prevention architecturale
+        6. Architectural Prevention
       
     </span>
   </a>
@@ -1375,10 +1375,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-anti-patterns-a-eviter" class="md-nav__link">
+  <a href="#7-anti-patterns-to-avoid" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. Anti-patterns a eviter
+        7. Anti-patterns to Avoid
       
     </span>
   </a>
@@ -1386,10 +1386,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-cas-limites-et-variantes" class="md-nav__link">
+  <a href="#8-edge-cases-and-variants" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8. Cas limites et variantes
+        8. Edge Cases and Variants
       
     </span>
   </a>
@@ -1397,10 +1397,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#9-checklist-daudit" class="md-nav__link">
+  <a href="#9-audit-checklist" class="md-nav__link">
     <span class="md-ellipsis">
       
-        9. Checklist d'audit
+        9. Audit Checklist
       
     </span>
   </a>
@@ -1408,10 +1408,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#10-pour-aller-plus-loin" class="md-nav__link">
+  <a href="#10-further-reading" class="md-nav__link">
     <span class="md-ellipsis">
       
-        10. Pour aller plus loin
+        10. Further Reading
       
     </span>
   </a>
@@ -1438,51 +1438,51 @@
   
 
 
-<h1 id="pattern-n03-cascade-de-penalites-effet-multiplicatif">Pattern N°03 — Cascade de Penalites (Effet Multiplicatif)<a class="headerlink" href="#pattern-n03-cascade-de-penalites-effet-multiplicatif" title="Permanent link">&para;</a></h1>
-<p><strong>Categorie :</strong> Boucles &amp; Orchestration
-<strong>Severite :</strong> High
-<strong>Frameworks impactes :</strong> LangChain / CrewAI / AutoGen / LangGraph / Custom
-<strong>Temps moyen de debogage si non detecte :</strong> 3 a 14 jours (le systeme tourne mais sous-performe ; la cause est rarement recherchee dans les ajustements de parametres)</p>
+<h1 id="pattern-03-penalty-cascade-multiplicative-effect">Pattern #03 — Penalty Cascade (Multiplicative Effect)<a class="headerlink" href="#pattern-03-penalty-cascade-multiplicative-effect" title="Permanent link">&para;</a></h1>
+<p><strong>Category:</strong> Loops &amp; Orchestration
+<strong>Severity:</strong> High
+<strong>Affected frameworks:</strong> LangChain / CrewAI / AutoGen / LangGraph / Custom
+<strong>Average debugging time if undetected:</strong> 3 to 14 days (the system keeps running but underperforms; the root cause is rarely traced back to parameter adjustments)</p>
 <hr />
-<h2 id="1-symptome-observable">1. Symptome observable<a class="headerlink" href="#1-symptome-observable" title="Permanent link">&para;</a></h2>
-<p>Un parametre critique du systeme (budget de tokens, timeout, score de confiance, taille de batch) tombe a une valeur <strong>absurdement basse</strong> sans qu'aucune erreur n'apparaisse. Le systeme continue de fonctionner — il ne crashe pas, ne leve aucune exception — mais ses resultats sont negligeables.</p>
-<p>Un budget de tokens de 4000 tombe a 280. Un timeout de 30 secondes tombe a 2.1 secondes. Un seuil de confiance de 0.25 tombe a 0.018. Les actions sont techniquement executees mais avec des parametres si bas que le resultat est inutile : les reponses LLM sont tronquees, les requetes expirent avant d'aboutir, les scores sont tous en dessous du seuil.</p>
-<p>Le symptome est intermittent. Il se manifeste quand <strong>plusieurs conditions negatives coincident</strong> : un jour specifique de la semaine, pendant les heures creuses, apres une serie d'echecs. Chaque condition declenche independamment un ajustement raisonnable. C'est leur combinaison simultanee qui cree la catastrophe.</p>
-<h2 id="2-histoire-vecue-anonymisee">2. Histoire vecue (anonymisee)<a class="headerlink" href="#2-histoire-vecue-anonymisee" title="Permanent link">&para;</a></h2>
-<p>Un pipeline d'analyse de donnees multi-agents utilisait 5 modules qui ajustaient dynamiquement le budget de tokens LLM en fonction des conditions du moment. Un module reduisait de 20% le mardi (historiquement le jour le plus bruite). Un autre reduisait de 50% apres 3 erreurs consecutives. Un troisieme reduisait de 30% en dehors des heures de bureau. Un quatrieme reduisait de 50% si le taux d'erreur global depassait 5%. Un cinquieme reduisait de 50% pendant la maintenance nocturne.</p>
-<p>Un mardi soir a 23h, apres une serie d'erreurs, les 5 modules ont triggue simultanement : <code>0.8 x 0.5 x 0.7 x 0.5 x 0.5 = 0.07</code>. Le budget est tombe a 7% de sa valeur nominale — de 4000 tokens a 280. Les reponses du LLM etaient tronquees en mid-sentence, rendant les analyses inutilisables. Le systeme a tourne dans cet etat pendant 6 heures avant que l'alerte de qualite ne se declenche le lendemain matin.</p>
-<h2 id="3-cause-racine-technique">3. Cause racine technique<a class="headerlink" href="#3-cause-racine-technique" title="Permanent link">&para;</a></h2>
-<p>Le bug se produit quand <strong>N modules ajustent le meme parametre independamment</strong> dans le meme cycle de traitement. Chaque module fait un read-modify-write sans connaitre les ajustements des autres :</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Module 1 : ajustement temporel</span>
+<h2 id="1-observable-symptoms">1. Observable Symptoms<a class="headerlink" href="#1-observable-symptoms" title="Permanent link">&para;</a></h2>
+<p>A critical system parameter (token budget, timeout, confidence score, batch size) drops to an <strong>absurdly low value</strong> with no error raised. The system keeps running — it does not crash, it raises no exception — but its output is negligible.</p>
+<p>A token budget of 4000 drops to 280. A 30-second timeout drops to 2.1 seconds. A confidence threshold of 0.25 drops to 0.018. Actions are technically executed but with parameters so low that the result is useless: LLM responses are truncated, requests time out before completing, scores all fall below the threshold.</p>
+<p>The symptom is intermittent. It manifests when <strong>several negative conditions coincide</strong>: a specific day of the week, during off-peak hours, after a series of failures. Each condition independently triggers a reasonable adjustment. Their simultaneous combination creates the failure.</p>
+<h2 id="2-field-story-anonymized">2. Field Story (anonymized)<a class="headerlink" href="#2-field-story-anonymized" title="Permanent link">&para;</a></h2>
+<p>A multi-agent data analysis pipeline used 5 modules that dynamically adjusted the LLM token budget based on current conditions. One module reduced it by 20% on Tuesdays (historically the noisiest day). Another reduced it by 50% after 3 consecutive errors. A third reduced it by 30% outside business hours. A fourth reduced it by 50% if the overall error rate exceeded 5%. A fifth reduced it by 50% during nightly maintenance.</p>
+<p>On a Tuesday night at 11 PM, after a series of errors, all 5 modules triggered simultaneously: <code>0.8 x 0.5 x 0.7 x 0.5 x 0.5 = 0.07</code>. The budget dropped to 7% of its nominal value — from 4000 tokens to 280. LLM responses were truncated mid-sentence, rendering the analyses unusable. The system ran in this state for 6 hours before a quality alert fired the next morning.</p>
+<h2 id="3-technical-root-cause">3. Technical Root Cause<a class="headerlink" href="#3-technical-root-cause" title="Permanent link">&para;</a></h2>
+<p>The bug occurs when <strong>N modules independently adjust the same parameter</strong> within the same processing cycle. Each module performs a read-modify-write without awareness of the other modules' adjustments:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Module 1: time-based adjustment</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">config</span><span class="p">[</span><span class="s2">&quot;token_budget&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">0.8</span>  <span class="c1"># Mardi = -20%</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">config</span><span class="p">[</span><span class="s2">&quot;token_budget&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">0.8</span>  <span class="c1"># Tuesday = -20%</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">save_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># Module 2 : ajustement erreurs (meme cycle, 2 secondes plus tard)</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>  <span class="c1"># Lit la valeur DEJA reduite par Module 1</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">config</span><span class="p">[</span><span class="s2">&quot;token_budget&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">0.5</span>  <span class="c1"># 3 erreurs = -50%</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># Module 2: error-based adjustment (same cycle, 2 seconds later)</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>  <span class="c1"># Reads the value ALREADY reduced by Module 1</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">config</span><span class="p">[</span><span class="s2">&quot;token_budget&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">0.5</span>  <span class="c1"># 3 errors = -50%</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">save_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="c1"># Module 3, 4, 5 : idem...</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1"># Resultat final : 0.8 * 0.5 * 0.7 * 0.5 * 0.5 = 0.07 du nominal</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="c1"># Modules 3, 4, 5: same pattern...</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1"># Final result: 0.8 * 0.5 * 0.7 * 0.5 * 0.5 = 0.07 of nominal</span>
 </code></pre></div>
-<p>Le probleme fondamental est que chaque module pense ajuster depuis la valeur <strong>nominale</strong>, alors qu'il ajuste depuis la valeur <strong>deja reduite</strong> par les modules precedents. Les multiplicateurs sont appliques en serie au lieu d'etre accumules puis appliques une seule fois.</p>
-<p>C'est un probleme de <strong>commutativity brisee</strong> : l'ordre d'execution des modules change le resultat. Si le module 1 s'execute avant le module 2, le resultat est different que si c'est l'inverse. Et comme l'ordre depend du scheduling, le bug peut apparaitre ou disparaitre de maniere apparemment aleatoire.</p>
+<p>The fundamental problem is that each module believes it is adjusting from the <strong>nominal</strong> value, when in fact it is adjusting from the value <strong>already reduced</strong> by prior modules. Multipliers are applied in series instead of being accumulated and applied once.</p>
+<p>This is a <strong>broken commutativity</strong> problem: the execution order of the modules changes the outcome. If module 1 runs before module 2, the result differs from the reverse order. And since the order depends on scheduling, the bug can appear or disappear in an apparently random fashion.</p>
 <h2 id="4-detection">4. Detection<a class="headerlink" href="#4-detection" title="Permanent link">&para;</a></h2>
-<h3 id="41-detection-manuelle-audit-code">4.1 Detection manuelle (audit code)<a class="headerlink" href="#41-detection-manuelle-audit-code" title="Permanent link">&para;</a></h3>
-<p>Chercher les endroits ou un parametre est modifie par read-modify-write :</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Chercher les patterns de multiplication/division sur des parametres de config</span>
+<h3 id="41-manual-code-audit">4.1 Manual code audit<a class="headerlink" href="#41-manual-code-audit" title="Permanent link">&para;</a></h3>
+<p>Look for locations where a parameter is modified via read-modify-write:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Search for multiplication/division patterns on config parameters</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>grep<span class="w"> </span>-rn<span class="w"> </span><span class="s2">&quot;\*=\s*0\.\|/=\s*[0-9]&quot;</span><span class="w"> </span>--include<span class="o">=</span><span class="s2">&quot;*.py&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span><span class="s2">&quot;config\|param\|budget\|threshold&quot;</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Chercher les ecritures multiples au meme fichier de config</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Search for multiple writes to the same config file</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>grep<span class="w"> </span>-rn<span class="w"> </span><span class="s2">&quot;save_config\|write_config\|dump.*json&quot;</span><span class="w"> </span>--include<span class="o">=</span><span class="s2">&quot;*.py&quot;</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Compter combien de fichiers modifient le meme parametre</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Count how many files modify the same parameter</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>grep<span class="w"> </span>-rln<span class="w"> </span><span class="s2">&quot;token_budget\|risk_percent\|timeout&quot;</span><span class="w"> </span>--include<span class="o">=</span><span class="s2">&quot;*.py&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l
 </code></pre></div>
-<p>Si &gt; 2 fichiers modifient le meme parametre, c'est un candidat pour la cascade.</p>
-<h3 id="42-detection-automatisee-cicd">4.2 Detection automatisee (CI/CD)<a class="headerlink" href="#42-detection-automatisee-cicd" title="Permanent link">&para;</a></h3>
-<p>Ajouter un test qui simule l'execution de tous les modules d'ajustement et verifie que le parametre ne descend pas en dessous d'un floor :</p>
+<p>If more than 2 files modify the same parameter, it is a cascade candidate.</p>
+<h3 id="42-automated-cicd">4.2 Automated CI/CD<a class="headerlink" href="#42-automated-cicd" title="Permanent link">&para;</a></h3>
+<p>Add a test that simulates all adjustment modules running and verifies the parameter does not drop below a floor:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_parameter_floor_after_all_adjustments</span><span class="p">():</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure no parameter drops below 20% of nominal after all adjustments.&quot;&quot;&quot;</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">nominal</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;token_budget&quot;</span><span class="p">:</span> <span class="mi">4000</span><span class="p">,</span> <span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">}</span>
@@ -1497,8 +1497,8 @@
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">nominal</span><span class="p">[</span><span class="n">param</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>        <span class="p">)</span>
 </code></pre></div>
-<h3 id="43-detection-runtime-production">4.3 Detection runtime (production)<a class="headerlink" href="#43-detection-runtime-production" title="Permanent link">&para;</a></h3>
-<p>Logger chaque ajustement avec sa source et detecter les cascades en temps reel :</p>
+<h3 id="43-runtime-production">4.3 Runtime production<a class="headerlink" href="#43-runtime-production" title="Permanent link">&para;</a></h3>
+<p>Log each adjustment with its source and detect cascades in real time:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
@@ -1535,12 +1535,12 @@
 <a id="__codelineno-3-34" name="__codelineno-3-34" href="#__codelineno-3-34"></a>                    <span class="p">}</span>
 <a id="__codelineno-3-35" name="__codelineno-3-35" href="#__codelineno-3-35"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;cascade&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 </code></pre></div>
-<h2 id="5-correction">5. Correction<a class="headerlink" href="#5-correction" title="Permanent link">&para;</a></h2>
-<h3 id="51-fix-immediat">5.1 Fix immediat<a class="headerlink" href="#51-fix-immediat" title="Permanent link">&para;</a></h3>
-<p>Ajouter un floor absolu a chaque parametre. Quelles que soient les reductions, le parametre ne descend jamais en dessous de X% du nominal :</p>
+<h2 id="5-fix">5. Fix<a class="headerlink" href="#5-fix" title="Permanent link">&para;</a></h2>
+<h3 id="51-immediate-fix">5.1 Immediate fix<a class="headerlink" href="#51-immediate-fix" title="Permanent link">&para;</a></h3>
+<p>Add a hard floor to each parameter. Regardless of reductions, the parameter never drops below X% of nominal:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">FLOORS</span> <span class="o">=</span> <span class="p">{</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">&quot;token_budget&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>    <span class="c1"># Minimum 1000 tokens</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>          <span class="c1"># Minimum 5 secondes</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>          <span class="c1"># Minimum 5 seconds</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>       <span class="c1"># Minimum 10%</span>
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">}</span>
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
@@ -1550,8 +1550,8 @@
 <a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="n">floor</span> <span class="o">=</span> <span class="n">FLOORS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">current</span> <span class="o">*</span> <span class="mf">0.2</span><span class="p">)</span>  <span class="c1"># Default floor: 20% of current</span>
 <a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">adjusted</span><span class="p">,</span> <span class="n">floor</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="52-fix-robuste">5.2 Fix robuste<a class="headerlink" href="#52-fix-robuste" title="Permanent link">&para;</a></h3>
-<p>Remplacer les read-modify-write independants par un <strong>pipeline accumulatif</strong> :</p>
+<h3 id="52-robust-fix">5.2 Robust fix<a class="headerlink" href="#52-robust-fix" title="Permanent link">&para;</a></h3>
+<p>Replace independent read-modify-write operations with an <strong>accumulative pipeline</strong>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nd">@dataclass</span>
@@ -1591,47 +1591,47 @@
 <a id="__codelineno-5-37" name="__codelineno-5-37" href="#__codelineno-5-37"></a><span class="n">pipeline</span><span class="o">.</span><span class="n">propose</span><span class="p">(</span><span class="s2">&quot;night_module&quot;</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s2">&quot;Off-hours&quot;</span><span class="p">)</span>
 <a id="__codelineno-5-38" name="__codelineno-5-38" href="#__codelineno-5-38"></a><span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>  <span class="c1"># final = 4000 * 0.3 = 1200 (floored), not 4000 * 0.28 = 1120</span>
 </code></pre></div>
-<h2 id="6-prevention-architecturale">6. Prevention architecturale<a class="headerlink" href="#6-prevention-architecturale" title="Permanent link">&para;</a></h2>
-<p>La prevention repose sur un principe : <strong>les modules ne modifient jamais un parametre directement</strong>. Ils soumettent des propositions d'ajustement a un pipeline centralise qui les agrege et les applique une seule fois par cycle.</p>
-<p>Ce pipeline agit comme un <strong>middleware de config</strong> : il recoit les propositions de N modules, calcule le multiplicateur cumule, applique un floor configurable, et ecrit le resultat final. Les modules n'ont aucun acces en ecriture directe au parametre.</p>
-<p>En complement, l'audit trail du pipeline (quel module a propose quel ajustement, et quel a ete le resultat final) permet de diagnostiquer immediatement pourquoi un parametre est bas. Au lieu de chercher dans 5 fichiers differents, tout est centralise dans un log unique.</p>
-<h2 id="7-anti-patterns-a-eviter">7. Anti-patterns a eviter<a class="headerlink" href="#7-anti-patterns-a-eviter" title="Permanent link">&para;</a></h2>
+<h2 id="6-architectural-prevention">6. Architectural Prevention<a class="headerlink" href="#6-architectural-prevention" title="Permanent link">&para;</a></h2>
+<p>Prevention rests on one principle: <strong>modules never modify a parameter directly</strong>. They submit adjustment proposals to a centralized pipeline that aggregates them and applies the result once per cycle.</p>
+<p>This pipeline acts as a <strong>config middleware</strong>: it receives proposals from N modules, computes the cumulative multiplier, applies a configurable floor, and writes the final value. Modules have no direct write access to the parameter.</p>
+<p>Additionally, the pipeline's audit trail (which module proposed which adjustment, and what the final result was) enables immediate diagnosis of why a parameter is low. Instead of searching across 5 separate files, everything is centralized in a single log.</p>
+<h2 id="7-anti-patterns-to-avoid">7. Anti-patterns to Avoid<a class="headerlink" href="#7-anti-patterns-to-avoid" title="Permanent link">&para;</a></h2>
 <ol>
 <li>
-<p><strong>Read-modify-write independant sur un parametre partage.</strong> C'est la cause directe de la cascade. Chaque module doit proposer un ajustement relatif, pas ecrire une valeur absolue.</p>
+<p><strong>Independent read-modify-write on a shared parameter.</strong> This is the direct cause of the cascade. Each module must propose a relative adjustment, not write an absolute value.</p>
 </li>
 <li>
-<p><strong>Pas de floor sur les parametres critiques.</strong> Un token budget de 0 ou un timeout de 0.1s sont des valeurs qui cassent le systeme. Chaque parametre doit avoir un minimum defini.</p>
+<p><strong>No floor on critical parameters.</strong> A token budget of 0 or a timeout of 0.1s are values that break the system. Every parameter must have a defined minimum.</p>
 </li>
 <li>
-<p><strong>Multiplicateurs non bornes.</strong> Un module qui applique <code>*= 0.01</code> peut a lui seul reduire un parametre a 1% du nominal. Chaque multiplicateur individuel doit etre clampe (ex: entre 0.3 et 2.0).</p>
+<p><strong>Unbounded multipliers.</strong> A module applying <code>*= 0.01</code> can on its own reduce a parameter to 1% of nominal. Each individual multiplier must be clamped (e.g., between 0.3 and 2.0).</p>
 </li>
 <li>
-<p><strong>Pas d'audit trail des ajustements.</strong> Sans log de qui a modifie quoi et quand, le diagnostic d'une cascade est un cauchemar. Logger chaque ajustement avec source, ancien valeur, nouvelle valeur, et timestamp.</p>
+<p><strong>No audit trail for adjustments.</strong> Without a log of who changed what and when, diagnosing a cascade is a nightmare. Log every adjustment with source, old value, new value, and timestamp.</p>
 </li>
 <li>
-<p><strong>Tester les modules d'ajustement en isolation.</strong> Chaque module teste separement fonctionne parfaitement. C'est la combinaison qui cree le bug. Le test de cascade doit simuler l'execution simultanee de tous les modules.</p>
+<p><strong>Testing adjustment modules in isolation.</strong> Each module tested separately works perfectly. The combination is what creates the bug. The cascade test must simulate all modules firing simultaneously.</p>
 </li>
 </ol>
-<h2 id="8-cas-limites-et-variantes">8. Cas limites et variantes<a class="headerlink" href="#8-cas-limites-et-variantes" title="Permanent link">&para;</a></h2>
-<p><strong>Variante 1 : Cascade ascendante.</strong> Au lieu de reduire, les modules augmentent un parametre (ex: timeout, budget). Le timeout passe de 30s a 300s, les requetes prennent 5 minutes chacune, le systeme est techniquement fonctionnel mais extremement lent.</p>
-<p><strong>Variante 2 : Cascade sur des parametres interdependants.</strong> Le module A reduit le budget de tokens. Le module B augmente le nombre de retries parce que les reponses sont tronquees (budget trop bas). Le module C reduit encore le budget parce que le nombre de retries est trop eleve. Boucle de retroaction qui amplifie la cascade.</p>
-<p><strong>Variante 3 : Cascade temporelle.</strong> Les modules ne trigguent pas dans le meme cycle mais sur des cycles successifs. Le parametre descend de 5% par cycle, trop lentement pour declencher une alerte instantanee, mais apres 50 cycles il est a 7% du nominal. La "cascade lente" est la plus difficile a detecter.</p>
-<h2 id="9-checklist-daudit">9. Checklist d'audit<a class="headerlink" href="#9-checklist-daudit" title="Permanent link">&para;</a></h2>
+<h2 id="8-edge-cases-and-variants">8. Edge Cases and Variants<a class="headerlink" href="#8-edge-cases-and-variants" title="Permanent link">&para;</a></h2>
+<p><strong>Variant 1: Upward cascade.</strong> Instead of reducing, modules increase a parameter (e.g., timeout, budget). The timeout climbs from 30s to 300s, requests each take 5 minutes, and the system is technically functional but extremely slow.</p>
+<p><strong>Variant 2: Cascade on interdependent parameters.</strong> Module A reduces the token budget. Module B increases the retry count because responses are truncated (budget too low). Module C further reduces the budget because the retry count is too high. A feedback loop that amplifies the cascade.</p>
+<p><strong>Variant 3: Temporal cascade.</strong> Modules do not trigger in the same cycle but on successive cycles. The parameter drops by 5% per cycle, too slowly to fire an instant alert, but after 50 cycles it is at 7% of nominal. The "slow cascade" is the hardest to detect.</p>
+<h2 id="9-audit-checklist">9. Audit Checklist<a class="headerlink" href="#9-audit-checklist" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[ ] Chaque parametre critique a un floor absolu defini et documente</li>
-<li>[ ] Les modules d'ajustement proposent des multiplicateurs au lieu d'ecrire des valeurs absolues</li>
-<li>[ ] Un pipeline centralise agrege les ajustements et applique un floor cumulatif</li>
-<li>[ ] L'audit trail enregistre chaque ajustement (source, ancien, nouveau, timestamp)</li>
-<li>[ ] Un test d'integration simule le worst case (tous les modules trigguent) et verifie le floor</li>
+<li>[ ] Every critical parameter has an absolute floor defined and documented</li>
+<li>[ ] Adjustment modules propose multipliers instead of writing absolute values</li>
+<li>[ ] A centralized pipeline aggregates adjustments and applies a cumulative floor</li>
+<li>[ ] The audit trail records every adjustment (source, old value, new value, timestamp)</li>
+<li>[ ] An integration test simulates the worst case (all modules fire) and verifies the floor</li>
 </ul>
-<h2 id="10-pour-aller-plus-loin">10. Pour aller plus loin<a class="headerlink" href="#10-pour-aller-plus-loin" title="Permanent link">&para;</a></h2>
+<h2 id="10-further-reading">10. Further Reading<a class="headerlink" href="#10-further-reading" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Pattern court correspondant : <a href="https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-03">Pattern 03 — Cascade de Penalites</a></li>
-<li>Patterns connexes : #11 (Race Condition on Shared File — les read-modify-write concurrents sont le meme mecanisme), #10 (Survival Mode Deadlock — une cascade qui reduit un seuil de confiance peut mener au deadlock)</li>
-<li>Lectures recommandees :</li>
-<li>"Release It!" (Michael T. Nygard, 2018), chapitre sur les cascading failures et les stability patterns</li>
-<li>Documentation CrewAI sur la gestion de config partagee entre agents — la section "shared state pitfalls"</li>
+<li>Short pattern: <a href="https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-03">Pattern 03 — Cascade de Penalites</a></li>
+<li>Related patterns: #11 (Race Condition on Shared File — concurrent read-modify-writes are the same mechanism), #10 (Survival Mode Deadlock — a cascade reducing a confidence threshold can lead to deadlock)</li>
+<li>Recommended reading:</li>
+<li>"Release It!" (Michael T. Nygard, 2018), chapter on cascading failures and stability patterns</li>
+<li>CrewAI documentation on shared config management between agents — the "shared state pitfalls" section</li>
 </ul>
 
 
