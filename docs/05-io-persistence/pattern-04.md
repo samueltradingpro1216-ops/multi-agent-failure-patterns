@@ -1,73 +1,73 @@
-# Pattern N°04 — Multi-File State Desync
+# Pattern #04 — Multi-File State Desync
 
-**Categorie :** I/O & Persistence
-**Severite :** Critical
-**Frameworks impactes :** LangChain / CrewAI / AutoGen / LangGraph / Custom
-**Temps moyen de debogage si non detecte :** 3 a 15 jours (le bug est masque par le fait que chaque composant fonctionne correctement en isolation)
+**Category:** I/O & Persistence
+**Severity:** Critical
+**Affected frameworks:** LangChain / CrewAI / AutoGen / LangGraph / Custom
+**Average debugging time if undetected:** 3 to 15 days (the bug is masked by the fact that each component behaves correctly in isolation)
 
 ---
 
-## 1. Symptome observable
+## 1. Observable Symptoms
 
-Trois composants du systeme donnent **trois reponses differentes** a la meme question. L'executeur pense que le systeme est en arret d'urgence. Le superviseur pense que tout fonctionne normalement. Le dashboard crash car un fichier d'etat n'existe pas.
+Three system components give **three different answers** to the same question. The executor believes the system is in emergency shutdown. The supervisor believes everything is running normally. The dashboard crashes because a state file does not exist.
 
-Le symptome le plus deroutant : chaque composant a **raison selon sa propre source de donnees**. L'executeur lit un fichier qui dit "ARRET". Le superviseur lit une config qui dit "actif". Le dashboard cherche un fichier JSON qui n'a jamais ete cree. Aucun ne ment — ils lisent simplement des sources differentes qui ne sont pas synchronisees.
+The most confusing symptom: each component is **correct according to its own data source**. The executor reads a file that says "SHUTDOWN". The supervisor reads a config that says "active". The dashboard looks for a JSON file that was never created. None of them is lying — they are simply reading different sources that are not synchronized.
 
-En consequences indirectes : des commandes sont envoyees mais jamais executees (le superviseur envoie, l'executeur bloque), des alertes se declenchent sans raison (le dashboard voit un etat incoherent), et le developpeur passe des heures a chercher un bug qui n'est pas dans le code mais dans la **topologie des donnees**.
+Indirect consequences: commands are sent but never executed (the supervisor sends, the executor blocks), alerts fire without cause (the dashboard sees an inconsistent state), and the developer spends hours looking for a bug that lives not in the code but in the **data topology**.
 
-## 2. Histoire vecue (anonymisee)
+## 2. Field Story (anonymized)
 
-Un systeme multi-agents avait un mecanisme d'arret d'urgence ("killswitch") dont l'etat etait stocke en 3 endroits :
-- Un fichier texte simple (`emergency.txt`) ecrit par l'executeur
-- Un fichier JSON structure (`emergency_state.json`) pour le dashboard
-- Un champ dans la config partagee (`config.json → emergency_active: false`) pour le superviseur
+A multi-agent system had an emergency shutdown mechanism ("killswitch") whose state was stored in 3 places:
+- A plain text file (`emergency.txt`) written by the executor
+- A structured JSON file (`emergency_state.json`) for the dashboard
+- A field in the shared config (`config.json → emergency_active: false`) for the supervisor
 
-Lors d'un incident 10 jours plus tot, l'executeur avait active l'arret d'urgence en ecrivant "ACTIVE" dans le fichier texte. L'incident avait ete resolu manuellement en changeant `emergency_active: false` dans la config. Mais personne n'avait pense a mettre a jour le fichier texte.
+During an incident 10 days earlier, the executor had activated the emergency shutdown by writing "ACTIVE" to the text file. The incident was resolved manually by changing `emergency_active: false` in the config. But nobody thought to update the text file.
 
-Resultat : 10 jours plus tard, l'executeur lisait toujours "ACTIVE" dans son fichier et refusait silencieusement les commandes du superviseur. Le superviseur, lui, voyait `emergency_active: false` et continuait d'envoyer des commandes. Il a fallu 3 heures de debugging pour comprendre que le probleme n'etait pas dans le code mais dans un fichier texte stale de 10 jours.
+Result: 10 days later, the executor was still reading "ACTIVE" from its file and silently rejecting commands from the supervisor. The supervisor, seeing `emergency_active: false`, kept sending commands. It took 3 hours of debugging to understand that the problem was not in the code but in a stale text file that was 10 days old.
 
-## 3. Cause racine technique
+## 3. Technical Root Cause
 
-L'etat a ete **duplique progressivement** au fil du developpement du systeme. Chaque nouvelle fonctionnalite a ajoute sa propre representation de l'etat sans synchroniser les precedentes :
-
-```
-V1 (mois 1) : executeur ecrit emergency.txt           ← format texte
-V2 (mois 3) : superviseur utilise config.json          ← champ JSON
-V3 (mois 6) : dashboard lit emergency_state.json       ← JSON structure
-```
-
-A aucun moment ces 3 fichiers ne sont synchronises. Chaque composant ecrit dans "son" fichier et ne lit que celui-la. Le resultat est 3 sources de verite pour un seul etat :
+State was **progressively duplicated** as the system evolved. Each new feature added its own representation of the state without synchronizing the existing ones:
 
 ```
-emergency.txt          → "ACTIVE"    (ecrit il y a 10 jours, jamais nettoye)
-emergency_state.json   → absent      (jamais cree)
-config.json            → false       (mis a jour manuellement)
+V1 (month 1) : executor writes emergency.txt           ← plain text format
+V2 (month 3) : supervisor uses config.json              ← JSON field
+V3 (month 6) : dashboard reads emergency_state.json     ← structured JSON
 ```
 
-Le probleme fondamental est l'absence de **Single Source of Truth** (SSOT). Quand un etat critique est stocke a N endroits, il faut N operations synchronisees pour le modifier. En pratique, seules 1 ou 2 operations sont faites, et les N-1 ou N-2 restantes divergent silencieusement.
+At no point are these 3 files synchronized. Each component writes to "its own" file and reads only that one. The result is 3 sources of truth for a single state:
+
+```
+emergency.txt          → "ACTIVE"    (written 10 days ago, never cleaned up)
+emergency_state.json   → absent      (never created)
+config.json            → false       (updated manually)
+```
+
+The fundamental problem is the absence of a **Single Source of Truth** (SSOT). When a critical state is stored in N places, N synchronized operations are required to modify it. In practice, only 1 or 2 operations are performed, and the remaining N-1 or N-2 copies silently diverge.
 
 ## 4. Detection
 
-### 4.1 Detection manuelle (audit code)
+### 4.1 Manual code audit
 
-Pour chaque etat critique du systeme, lister toutes les sources qui le stockent :
+For each critical state in the system, list every source that stores it:
 
 ```bash
-# Chercher toutes les references a un etat specifique (ex: "emergency", "killswitch")
+# Find all references to a specific state (e.g., "emergency", "killswitch")
 grep -rn "emergency\|killswitch\|shutdown" --include="*.py" --include="*.json"
 
-# Compter les fichiers qui ECRIVENT cet etat
+# Count files that WRITE this state
 grep -rln "emergency.*=\|write.*emergency\|emergency.*write" --include="*.py"
 
-# Compter les fichiers qui LISENT cet etat
+# Count files that READ this state
 grep -rln "read.*emergency\|emergency.*get\|load.*emergency" --include="*.py"
 ```
 
-Si le nombre de writers > 1 ou le nombre de sources > 1, c'est un candidat pour la desync.
+If the number of writers > 1 or the number of sources > 1, it is a candidate for desync.
 
-### 4.2 Detection automatisee (CI/CD)
+### 4.2 Automated CI/CD
 
-Documenter les etats critiques dans un fichier de referentiel et verifier en CI que chaque etat n'a qu'une seule source d'ecriture :
+Document critical states in a reference file and verify in CI that each state has exactly one write source:
 
 ```python
 # test_single_source_of_truth.py
@@ -97,9 +97,9 @@ def test_no_duplicate_writers():
         )
 ```
 
-### 4.3 Detection runtime (production)
+### 4.3 Runtime production
 
-A chaque cycle, comparer les valeurs de toutes les copies d'un meme etat :
+At each cycle, compare the values of all copies of the same state:
 
 ```python
 import json
@@ -131,11 +131,11 @@ def audit_state_consistency(state_name: str, sources: dict[str, callable]) -> li
     return alerts
 ```
 
-## 5. Correction
+## 5. Fix
 
-### 5.1 Fix immediat
+### 5.1 Immediate fix
 
-Synchroniser toutes les copies depuis la source primaire :
+Synchronize all copies from the primary source:
 
 ```python
 def sync_emergency_state(primary_value: bool):
@@ -153,9 +153,9 @@ def sync_emergency_state(primary_value: bool):
         json.dump(config, f, indent=2)
 ```
 
-### 5.2 Fix robuste
+### 5.2 Robust fix
 
-Implementer un **StateManager** qui est la seule facon de lire et modifier un etat. Il ecrit dans toutes les copies a chaque modification et lit depuis la source primaire uniquement :
+Implement a **StateManager** that is the sole interface for reading and modifying state. It writes to all copies on every update and reads exclusively from the primary source:
 
 ```python
 import json
@@ -226,48 +226,48 @@ class StateManager:
         return issues
 ```
 
-## 6. Prevention architecturale
+## 6. Architectural Prevention
 
-Le principe fondateur est le **Single Source of Truth** : chaque etat critique n'a qu'**une seule source d'ecriture**. Les autres representations sont des copies read-only synchronisees automatiquement.
+The founding principle is **Single Source of Truth**: each critical state has exactly **one write source**. All other representations are read-only copies synchronized automatically.
 
-En pratique, cela signifie migrer les etats critiques vers une base de donnees (SQLite pour un systeme local, PostgreSQL pour un systeme distribue) et eliminer les fichiers texte/JSON comme stockage d'etat. Les fichiers restent pour la compatibilite avec des composants legacy, mais ils sont generes par le StateManager et ne sont jamais lus comme source de verite.
+In practice, this means migrating critical states to a database (SQLite for a local system, PostgreSQL for a distributed system) and eliminating text/JSON files as state storage. Files may remain for compatibility with legacy components, but they are generated by the StateManager and are never read as a source of truth.
 
-Un sync periodique (toutes les 60 secondes) re-aligne les copies legacy avec la source primaire. Meme si un composant ecrit directement dans un fichier legacy (contournant le StateManager), le sync suivant ecrasera sa modification. C'est brutal mais efficace.
+A periodic sync (every 60 seconds) re-aligns legacy copies with the primary source. Even if a component writes directly to a legacy file (bypassing the StateManager), the next sync will overwrite its change. This is blunt but effective.
 
-## 7. Anti-patterns a eviter
+## 7. Anti-patterns to Avoid
 
-1. **Ajouter un nouveau fichier d'etat sans synchroniser les existants.** Chaque nouvelle representation d'un etat existant doit etre geree par le StateManager ou supprimee.
+1. **Adding a new state file without synchronizing existing ones.** Every new representation of an existing state must be managed by the StateManager or removed.
 
-2. **Resoudre un incident en modifiant manuellement un fichier.** Si on change `config.json` a la main mais pas `emergency.txt`, on cree une desync. Toujours passer par un script ou le StateManager.
+2. **Resolving an incident by manually editing a file.** If `config.json` is changed by hand but `emergency.txt` is not, a desync is created. Always go through a script or the StateManager.
 
-3. **Lire un fichier sans verifier sa fraicheur.** Un fichier qui n'a pas ete modifie depuis 10 jours est probablement stale. Chaque fichier d'etat devrait contenir un timestamp `last_synced`.
+3. **Reading a file without checking its freshness.** A file that has not been modified in 10 days is likely stale. Every state file should contain a `last_synced` timestamp.
 
-4. **Supposer que l'absence de fichier = etat par defaut.** Un fichier absent peut signifier "jamais cree" (etat initial) ou "supprime par accident" (corruption). Gerer explicitement les deux cas.
+4. **Assuming that a missing file equals the default state.** A missing file can mean "never created" (initial state) or "accidentally deleted" (corruption). Handle both cases explicitly.
 
-5. **Pas d'audit de coherence periodique.** Meme avec un StateManager, les fichiers peuvent diverger (ecriture directe, crash mid-sync). Un audit toutes les minutes qui compare les copies detecte les divergences en < 60 secondes.
+5. **No periodic consistency audit.** Even with a StateManager, files can diverge (direct writes, crash mid-sync). An audit every minute that compares copies detects divergences in under 60 seconds.
 
-## 8. Cas limites et variantes
+## 8. Edge Cases and Variants
 
-**Variante 1 : Config partagee entre agents.** Un fichier `config.json` lu par 4 agents, chacun modifiant des sections differentes. Sans lock, l'agent A peut ecraser les modifications de l'agent B. C'est une desync intra-fichier, pas inter-fichier.
+**Variant 1: Config shared between agents.** A `config.json` file read by 4 agents, each modifying different sections. Without a lock, agent A can overwrite agent B's changes. This is an intra-file desync, not an inter-file one.
 
-**Variante 2 : Cache applicatif desynchronise.** L'etat est correct dans la DB mais le cache en memoire d'un agent contient l'ancienne valeur. Le cache n'est pas invalide apres une modification. Solution : TTL court sur le cache ou invalidation explicite.
+**Variant 2: Application cache out of sync.** The state is correct in the DB but an agent's in-memory cache holds the old value. The cache is not invalidated after a modification. Solution: short TTL on the cache or explicit invalidation.
 
-**Variante 3 : Etat distribue entre machines.** Deux instances du meme agent tournent sur deux VPS. Chacune a sa propre copie locale de l'etat. Apres une modification sur l'instance A, l'instance B garde l'ancienne valeur. Solution : stockage centralise (Redis, Consul, ou DB).
+**Variant 3: Distributed state across machines.** Two instances of the same agent run on two VPS. Each has its own local copy of the state. After a modification on instance A, instance B retains the old value. Solution: centralized storage (Redis, Consul, or a DB).
 
-**Variante 4 : Fichier d'etat stale apres crash.** Le StateManager ecrit dans le fichier primaire, crashe avant de synchroniser les copies legacy. Au restart, les copies sont desynchronisees. Solution : le sync doit etre la premiere action au boot, avant toute lecture.
+**Variant 4: Stale state file after a crash.** The StateManager writes to the primary file, then crashes before synchronizing the legacy copies. On restart, the copies are desynchronized. Solution: the sync must be the first action at boot, before any read.
 
-## 9. Checklist d'audit
+## 9. Audit Checklist
 
-- [ ] Chaque etat critique a une source primaire designee et documentee
-- [ ] Aucun composant ne lit un fichier d'etat legacy directement (tous passent par le StateManager)
-- [ ] Un sync periodique re-aligne les copies legacy avec la source primaire
-- [ ] Chaque fichier d'etat contient un timestamp `last_synced` ou `last_modified`
-- [ ] Un audit de coherence compare toutes les copies a chaque cycle et alerte si divergence
+- [ ] Each critical state has a designated and documented primary source
+- [ ] No component reads a legacy state file directly (all go through the StateManager)
+- [ ] A periodic sync re-aligns legacy copies with the primary source
+- [ ] Each state file contains a `last_synced` or `last_modified` timestamp
+- [ ] A consistency audit compares all copies at every cycle and alerts on divergence
 
-## 10. Pour aller plus loin
+## 10. Further Reading
 
-- Pattern court correspondant : [Pattern 04 — Multi-File State Desync](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-04)
-- Patterns connexes : #11 (Race Condition on Shared File — ecriture concurrente dans le meme fichier), #08 (Data Pipeline Freeze — un fichier stale peut etre un symptome de desync), #01 (Timezone Mismatch — les timestamps dans les fichiers desynchronises peuvent etre en timezones differentes)
-- Lectures recommandees :
-  - "Designing Data-Intensive Applications" (Martin Kleppmann), chapitre 5 sur la replication et la consistance
-  - Documentation HashiCorp Consul sur le consensus distribue — les memes problemes a plus grande echelle
+- Short pattern: [Pattern 04 — Multi-File State Desync](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-04)
+- Related patterns: #11 (Race Condition on Shared File — concurrent writes to the same file), #08 (Data Pipeline Freeze — a stale file can be a symptom of desync), #01 (Timezone Mismatch — timestamps in desynchronized files may be in different timezones)
+- Recommended reading:
+  - "Designing Data-Intensive Applications" (Martin Kleppmann), chapter 5 on replication and consistency
+  - HashiCorp Consul documentation on distributed consensus — the same problems at a larger scale

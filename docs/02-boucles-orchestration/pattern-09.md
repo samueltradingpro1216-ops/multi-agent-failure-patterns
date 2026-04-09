@@ -1,40 +1,40 @@
-# Pattern N°09 — Agent Infinite Loop
+# Pattern #09 — Agent Infinite Loop
 
-**Categorie :** Boucles & Orchestration
-**Severite :** Critical
-**Frameworks impactes :** LangChain / CrewAI / AutoGen / LangGraph / Custom
-**Temps moyen de debogage si non detecte :** 0 a 1 jour (les consequences financieres sont immediates — la facture LLM explose ou le systeme tombe par OOM/CPU saturation)
+**Category:** Loops & Orchestration
+**Severity:** Critical
+**Affected frameworks:** LangChain / CrewAI / AutoGen / LangGraph / Custom
+**Average debugging time if undetected:** 0 to 1 day (financial consequences are immediate — the LLM bill explodes or the system crashes due to OOM/CPU saturation)
 
 ---
 
-## 1. Symptome observable
+## 1. Observable Symptoms
 
-Un agent consomme **100% du CPU** ou explose le quota d'appels API en quelques minutes. Les logs montrent le meme message repete des centaines de fois. La facture LLM passe de $5/jour a $500 en une heure. Le systeme entier ralentit car l'agent boucle monopolise les ressources partagees (pool de connexions HTTP, rate limits, memoire).
+An agent consumes **100% CPU** or exhausts the API call quota within minutes. Logs show the same message repeated hundreds of times. The LLM bill jumps from $5/day to $500 in an hour. The entire system slows down because the looping agent monopolizes shared resources (HTTP connection pool, rate limits, memory).
 
-Contrairement au Rapid-Fire Loop (Pattern #02) qui est cause par un **refresh externe**, ici c'est l'agent lui-meme qui se re-invoque. L'agent a un mecanisme de reflexion, de retry, ou de re-delegation qui boucle indefiniment :
+Unlike the Rapid-Fire Loop (Pattern #02), which is triggered by an **external refresh**, here it is the agent itself that re-invokes itself. The agent has a reflection, retry, or re-delegation mechanism that loops indefinitely:
 
 ```
-Agent → "Ma reponse n'est pas assez bonne" → re-invocation
-     → "Ma reponse n'est pas assez bonne" → re-invocation
-     → "Ma reponse n'est pas assez bonne" → re-invocation
-     → ... (indefiniment)
+Agent → "My response is not good enough" → re-invocation
+     → "My response is not good enough" → re-invocation
+     → "My response is not good enough" → re-invocation
+     → ... (indefinitely)
 ```
 
-Le symptome est souvent decouvert par un **quota exceeded** du provider LLM, un `RecursionError` Python, ou une alerte de monitoring systeme (CPU > 95% pendant > 5 minutes).
+The symptom is typically discovered via a **quota exceeded** error from the LLM provider, a Python `RecursionError`, or a system monitoring alert (CPU > 95% for > 5 minutes).
 
-## 2. Histoire vecue (anonymisee)
+## 2. Field Story (anonymized)
 
-Un systeme multi-agents avait un agent "reflexion" qui evaluait la qualite de ses propres reponses avant de les transmettre. Si le score de qualite etait inferieur a 90%, l'agent re-generait sa reponse. Le seuil etait ambitieux mais raisonnable pour des cas simples.
+A multi-agent system had a "reflection" agent that evaluated the quality of its own responses before forwarding them. If the quality score was below 90%, the agent would regenerate its response. The threshold was ambitious but reasonable for simple cases.
 
-Un vendredi soir, un utilisateur a soumis une requete ambigue dont la reponse parfaite n'existait pas. L'agent a genere une reponse (score: 72%), l'a evaluee, re-genere (score: 68%), re-evaluee, re-genere (score: 74%)... Le score oscillait autour de 70%, jamais assez pour atteindre 90%. En 15 minutes, l'agent avait fait 2000 appels LLM, consomme le quota quotidien, et la facture du provider affichait $340.
+On a Friday evening, a user submitted an ambiguous request for which no perfect answer existed. The agent generated a response (score: 72%), evaluated it, regenerated (score: 68%), re-evaluated, regenerated (score: 74%)... The score oscillated around 70%, never reaching 90%. Within 15 minutes, the agent had made 2,000 LLM calls, exhausted the daily quota, and the provider bill showed $340.
 
-Le systeme n'avait ni compteur de profondeur, ni timeout global, ni budget max par agent. L'agent etait "libre de recommencer autant qu'il le voulait" — une liberte qui s'est averee dangereuse.
+The system had no depth counter, no global timeout, and no per-agent maximum budget. The agent was "free to retry as many times as it wanted" — a freedom that proved dangerous.
 
-## 3. Cause racine technique
+## 3. Technical Root Cause
 
-L'agent a un mecanisme de re-invocation **non borne**. Trois variantes courantes :
+The agent has an **unbounded** re-invocation mechanism. Three common variants:
 
-**Variante 1 : Recursion directe.** L'agent s'appelle lui-meme :
+**Variant 1: Direct recursion.** The agent calls itself:
 
 ```python
 class ReflectionAgent:
@@ -43,35 +43,35 @@ class ReflectionAgent:
         quality = self.evaluate(response)
 
         if quality < 0.9:
-            return self.run(task)  # Recursion sans limite
+            return self.run(task)  # Unbounded recursion
 
         return response
 ```
 
-**Variante 2 : Boucle de delegation.** L'agent A delegue a l'agent B qui re-delegue a l'agent A :
+**Variant 2: Delegation loop.** Agent A delegates to agent B, which re-delegates to agent A:
 
 ```
-Agent A → "Je ne sais pas, demandons a B" → Agent B
-Agent B → "Je ne sais pas, demandons a A" → Agent A
-→ Ping-pong infini entre A et B
+Agent A → "I don't know, let's ask B" → Agent B
+Agent B → "I don't know, let's ask A" → Agent A
+→ Infinite ping-pong between A and B
 ```
 
-**Variante 3 : Side-effect qui re-declenche.** Un cron job lance un agent. L'agent ecrit un fichier. Le cron job detecte le nouveau fichier et relance l'agent :
+**Variant 3: Side-effect that re-triggers.** A cron job launches an agent. The agent writes a file. The cron job detects the new file and relaunches the agent:
 
 ```
-Cron → lance Agent → Agent ecrit output.json → Cron detecte le changement → relance Agent
+Cron → launches Agent → Agent writes output.json → Cron detects change → relaunches Agent
 ```
 
-Le probleme fondamental est l'absence de **condition d'arret garantie**. L'agent peut toujours trouver une raison de recommencer, et rien ne l'en empeche.
+The fundamental problem is the absence of a **guaranteed termination condition**. The agent can always find a reason to retry, and nothing prevents it from doing so.
 
 ## 4. Detection
 
-### 4.1 Detection manuelle (audit code)
+### 4.1 Manual code audit
 
-Chercher les appels recursifs et les boucles sans borne :
+Search for recursive calls and unbounded loops:
 
 ```bash
-# Recursion directe : methode qui s'appelle elle-meme
+# Direct recursion: method that calls itself
 grep -rn "def \(\w\+\).*:" --include="*.py" | while read line; do
     func=$(echo "$line" | grep -oP "def \K\w+")
     file=$(echo "$line" | cut -d: -f1)
@@ -80,16 +80,16 @@ grep -rn "def \(\w\+\).*:" --include="*.py" | while read line; do
     fi
 done
 
-# Boucles while True sans break conditionnel clair
+# while True loops without a clear conditional break
 grep -rn "while True\|while 1:" --include="*.py" -A5 | grep -v "break"
 
-# Agents qui se re-invoquent via un dispatch
+# Agents that re-invoke themselves via a dispatch
 grep -rn "dispatch\|invoke\|delegate\|re.*run" --include="*.py"
 ```
 
-### 4.2 Detection automatisee (CI/CD)
+### 4.2 Automated CI/CD
 
-Tester que chaque agent a un max_depth et un timeout :
+Test that every agent has a max_depth and a timeout:
 
 ```python
 def test_all_agents_have_depth_limit():
@@ -107,9 +107,9 @@ def test_all_agents_have_depth_limit():
         )
 ```
 
-### 4.3 Detection runtime (production)
+### 4.3 Runtime production
 
-Circuit breaker + invocation monitor :
+Circuit breaker + invocation monitor:
 
 ```python
 import time
@@ -146,11 +146,11 @@ class AgentCircuitBreaker:
         return True
 ```
 
-## 5. Correction
+## 5. Fix
 
-### 5.1 Fix immediat
+### 5.1 Immediate fix
 
-Ajouter un compteur de profondeur :
+Add a depth counter:
 
 ```python
 def run(self, task: str, _depth: int = 0, max_depth: int = 3) -> str:
@@ -167,9 +167,9 @@ def run(self, task: str, _depth: int = 0, max_depth: int = 3) -> str:
     return response
 ```
 
-### 5.2 Fix robuste
+### 5.2 Robust fix
 
-Combiner trois mecanismes : profondeur, timeout, et budget :
+Combine three mechanisms: depth, timeout, and budget:
 
 ```python
 import time
@@ -211,50 +211,50 @@ class SafeAgent:
         return response
 ```
 
-## 6. Prevention architecturale
+## 6. Architectural Prevention
 
-La prevention repose sur le principe de **bounded execution** : aucun agent ne peut s'executer indefiniment, quels que soient les inputs ou les conditions.
+Prevention is grounded in the principle of **bounded execution**: no agent can run indefinitely, regardless of inputs or conditions.
 
-**1. Budget par agent.** Chaque agent recoit un budget d'execution (tokens, appels API, secondes CPU) a la creation. Quand le budget est epuise, l'agent retourne son meilleur resultat et s'arrete. Le budget est gere par le framework, pas par l'agent lui-meme.
+**1. Per-agent budget.** Each agent receives an execution budget (tokens, API calls, CPU seconds) at creation time. When the budget is exhausted, the agent returns its best result and stops. The budget is managed by the framework, not by the agent itself.
 
-**2. Separation reflexion/execution.** L'agent qui genere une reponse n'est pas le meme que celui qui decide de re-generer. Un "juge" externe decide si la qualite est suffisante. Le juge a son propre budget (typiquement 2-3 evaluations max).
+**2. Separation of reflection and execution.** The agent that generates a response is not the same as the one that decides whether to regenerate. An external "judge" decides whether the quality is sufficient. The judge has its own budget (typically 2–3 evaluations maximum).
 
-**3. Worst-case return.** Tout agent doit pouvoir retourner un resultat a tout moment, meme si ce resultat est imparfait. "Meilleur effort apres N iterations" est toujours preferable a "boucle infinie en cherchant la perfection".
+**3. Worst-case return.** Every agent must be able to return a result at any time, even if that result is imperfect. "Best effort after N iterations" is always preferable to "infinite loop in pursuit of perfection".
 
-## 7. Anti-patterns a eviter
+## 7. Anti-patterns to Avoid
 
-1. **Recursion sans max_depth.** `self.run(task)` sans compteur est une bombe a retardement. Toujours passer `_depth + 1` et checker au debut.
+1. **Recursion without max_depth.** `self.run(task)` without a counter is a time bomb. Always pass `_depth + 1` and check it at the top.
 
-2. **Seuil de qualite inatteignable.** Si le score moyen est 70% et le seuil est 95%, l'agent bouclera presque toujours. Le seuil doit etre calibre sur les scores reels du systeme.
+2. **Unreachable quality threshold.** If the average score is 70% and the threshold is 95%, the agent will almost always loop. The threshold must be calibrated against the system's real observed scores.
 
-3. **Agent qui catch ses propres erreurs et retry.** `except Exception: return self.run(task)` — chaque erreur declenche un retry, qui peut generer une nouvelle erreur, qui retry...
+3. **Agent that catches its own errors and retries.** `except Exception: return self.run(task)` — every error triggers a retry, which can generate a new error, which retries...
 
-4. **Pas de monitoring des invocations.** Si personne ne compte combien de fois un agent s'execute par minute, les boucles passent inapercues jusqu'a ce que la facture arrive.
+4. **No invocation monitoring.** If nobody counts how many times an agent executes per minute, loops go unnoticed until the bill arrives.
 
-5. **Confiance dans le `sys.setrecursionlimit()` de Python.** Le default (1000) est eleve pour du code recursif. Un agent LLM qui boucle 1000 fois avant le `RecursionError` aura deja fait 1000 appels API.
+5. **Trusting Python's `sys.setrecursionlimit()`.** The default (1000) is high for recursive code. An LLM agent that loops 1,000 times before hitting `RecursionError` will have already made 1,000 API calls.
 
-## 8. Cas limites et variantes
+## 8. Edge Cases and Variants
 
-**Variante 1 : Boucle multi-agents.** Trois agents forment un cycle : A → B → C → A. Chacun a un max_depth individuel mais le cycle complet n'a pas de limite. Necessite un **global depth** qui traverse les delegations.
+**Variant 1: Multi-agent loop.** Three agents form a cycle: A → B → C → A. Each has an individual max_depth, but the full cycle has no limit. Requires a **global depth** counter that propagates across delegations.
 
-**Variante 2 : Boucle asynchrone.** L'agent poste un message dans une queue, un worker le traite et poste le resultat dans une autre queue que l'agent ecoute. La boucle passe par une infrastructure externe (queue) et n'est pas visible comme recursion dans le code.
+**Variant 2: Asynchronous loop.** The agent posts a message to a queue; a worker processes it and posts the result to another queue that the agent is listening on. The loop passes through external infrastructure (the queue) and is not visible as recursion in the code.
 
-**Variante 3 : Boucle par fichier.** L'agent ecrit un fichier, un file watcher detecte le changement et relance l'agent. La boucle passe par le filesystem et n'est pas detectable par analyse statique du code.
+**Variant 3: File-based loop.** The agent writes a file, a file watcher detects the change and relaunches the agent. The loop passes through the filesystem and is not detectable by static code analysis.
 
-**Variante 4 : Boucle lente.** L'agent ne boucle pas en millisecondes mais une fois par minute. En 24 heures, il a fait 1440 appels LLM. Le monitoring par fenetre de 5 minutes ne detecte rien (1 appel/minute = sous le seuil).
+**Variant 4: Slow loop.** The agent does not loop in milliseconds but once per minute. Over 24 hours it has made 1,440 LLM calls. A 5-minute monitoring window detects nothing (1 call/minute = below the threshold).
 
-## 9. Checklist d'audit
+## 9. Audit Checklist
 
-- [ ] Chaque agent recursif a un parametre max_depth (defaut: 3-5)
-- [ ] Chaque agent a un timeout global (defaut: 30-60 secondes)
-- [ ] Un budget d'appels LLM par agent est defini et monitore
-- [ ] Un circuit breaker coupe les agents qui depassent N invocations en T secondes
-- [ ] Les cycles de delegation entre agents sont identifies et bornes
+- [ ] Every recursive agent has a max_depth parameter (default: 3–5)
+- [ ] Every agent has a global timeout (default: 30–60 seconds)
+- [ ] An LLM call budget per agent is defined and monitored
+- [ ] A circuit breaker cuts agents that exceed N invocations in T seconds
+- [ ] Delegation cycles between agents are identified and bounded
 
-## 10. Pour aller plus loin
+## 10. Further Reading
 
-- Pattern court correspondant : [Pattern 09 — Agent Infinite Loop](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-09)
-- Patterns connexes : #02 (Rapid-Fire Loop — boucle declenchee par le refresh externe, pas par l'agent), #10 (Survival Mode Deadlock — un seuil inatteignable qui cause la boucle)
-- Lectures recommandees :
-  - Documentation LangGraph sur les "recursion limits" — le framework a un parametre `recursion_limit` exactement pour ce pattern
-  - "Building LLM Powered Applications" (Valentino Gagliardi, 2024) — chapitre sur les guardrails d'agents recursifs
+- Corresponding short pattern: [Pattern 09 — Agent Infinite Loop](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-09)
+- Related patterns: #02 (Rapid-Fire Loop — loop triggered by external refresh, not by the agent), #10 (Survival Mode Deadlock — an unreachable threshold causing the loop)
+- Recommended reading:
+  - LangGraph documentation on "recursion limits" — the framework has a `recursion_limit` parameter specifically for this pattern
+  - "Building LLM Powered Applications" (Valentino Gagliardi, 2024) — chapter on guardrails for recursive agents

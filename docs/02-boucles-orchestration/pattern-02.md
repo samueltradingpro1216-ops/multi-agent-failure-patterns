@@ -1,82 +1,82 @@
-# Pattern N°02 — Rapid-Fire Loop (Refresh Zombie)
+# Pattern #02 — Rapid-Fire Loop (Refresh Zombie)
 
-**Categorie :** Boucles & Orchestration
-**Severite :** High
-**Frameworks impactes :** LangChain / CrewAI / AutoGen / LangGraph / Custom
-**Temps moyen de debogage si non detecte :** 1 a 3 jours (le symptome est visible rapidement dans les logs ou la facturation, mais la cause racine est subtile)
+**Category:** Loops & Orchestration
+**Severity:** High
+**Affected frameworks:** LangChain / CrewAI / AutoGen / LangGraph / Custom
+**Average debugging time if undetected:** 1 to 3 days (the symptom appears quickly in logs or billing, but the root cause is subtle)
 
 ---
 
-## 1. Symptome observable
+## 1. Observable Symptoms
 
-L'executeur repete la meme action **en boucle rapide**, toutes les N secondes, sans interruption. Les logs montrent un pattern repetitif : la meme commande envoyee, executee, terminee, puis immediatement re-envoyee. Ce qui aurait du etre une action unique se transforme en centaines d'executions identiques en quelques heures.
+The executor repeats the same action **in a tight loop**, every N seconds, without interruption. Logs show a repetitive pattern: the same command sent, executed, completed, then immediately re-sent. What should have been a single action turns into hundreds of identical executions within a few hours.
 
-Les consequences sont proportionnelles au cout marginal de chaque execution. Si chaque iteration coute un appel API LLM, la facture explose en quelques minutes. Si chaque iteration consomme du I/O disque, les logs gonflent a des centaines de Mo par jour. Si chaque iteration execute une action reelle (envoi de message, ecriture en base), le systeme pollue ses propres donnees avec des duplicatas.
+The consequences scale with the marginal cost of each execution. If each iteration costs an LLM API call, the bill explodes within minutes. If each iteration consumes disk I/O, logs balloon to hundreds of MB per day. If each iteration performs a real-world action (sending a message, writing to a database), the system pollutes its own data with duplicates.
 
-Le symptome le plus trompeur : chaque execution individuelle **semble correcte**. Le log montre "action executee avec succes". C'est la repetition qui est le bug, pas l'action elle-meme. Un monitoring qui ne compte pas les executions par fenetre de temps ne detectera rien.
+The most deceptive symptom: each individual execution **appears correct**. The log shows "action executed successfully". The repetition is the bug, not the action itself. Any monitoring that does not count executions per time window will detect nothing.
 
-## 2. Histoire vecue (anonymisee)
+## 2. Field Story (anonymized)
 
-Un systeme de monitoring multi-agents generait des rapports d'analyse toutes les 10 secondes. Quand un rapport etait genere et que le consommateur n'avait pas de tache active, le mecanisme de refresh re-envoyait la commande de generation.
+A multi-agent monitoring system generated analysis reports every 10 seconds. When a report was generated and the consumer had no active task, the refresh mechanism re-sent the generation command.
 
-Le probleme : quand le consommateur terminait son rapport rapidement (en 2-3 secondes), son statut repassait a "idle". Le refresh voyait "idle" et re-envoyait la commande, croyant qu'elle n'avait jamais ete executee. En une journee, le systeme a genere 124 rapports identiques au lieu d'un seul. Chaque rapport coutait un appel LLM. La facture quotidienne a ete multipliee par 100.
+The problem: when the consumer finished its report quickly (in 2–3 seconds), its status returned to "idle". The refresh saw "idle" and re-sent the command, assuming it had never been executed. Over the course of one day, the system generated 124 identical reports instead of one. Each report cost an LLM call. The daily bill was multiplied by 100.
 
-Le bug a ete decouvert en regardant la facture du provider LLM, pas les logs — les logs montraient 124 executions "normales".
+The bug was discovered by looking at the LLM provider invoice, not the logs — the logs showed 124 "normal" executions.
 
-## 3. Cause racine technique
+## 3. Technical Root Cause
 
-Le bug naît quand un mecanisme de refresh/retry ne distingue pas deux etats qui partagent la meme representation externe :
-
-```
-Etat 1 : "La commande n'a PAS ENCORE ete executee"     → status = IDLE
-Etat 2 : "La commande a ete executee et est TERMINEE"  → status = IDLE
-
-Le refresh voit IDLE et re-envoie dans les deux cas.
-```
-
-Le cycle de vie implicite ressemble a ca :
+The bug originates when a refresh/retry mechanism fails to distinguish two states that share the same external representation:
 
 ```
-Signal → Commande ecrite → Executeur lit → Execution → Fin
-                                                        ↓
-                                                   status = IDLE
-                                                        ↓
-                                              Refresh voit IDLE
-                                                        ↓
-                                              Re-ecrit la commande
-                                                        ↓
-                                              Executeur re-execute → BOUCLE
+State 1: "The command has NOT YET been executed"  → status = IDLE
+State 2: "The command was executed and COMPLETED"  → status = IDLE
+
+The refresh sees IDLE and re-sends in both cases.
 ```
 
-Le probleme fondamental est l'**absence de state machine explicite**. Le systeme utilise un booleen (`has_active_task`) au lieu d'un enum a 4 etats (`IDLE → PENDING → EXECUTING → COMPLETED`). Quand `has_active_task` repasse a `False` apres completion, c'est indiscernable de "jamais execute".
+The implicit lifecycle looks like this:
 
-Les variantes incluent :
-- Un orchestrateur LangChain qui re-dispatche une tache parce que le resultat a ete consomme (le callback l'a lu et supprime)
-- Un agent CrewAI qui re-delegue une tache a un sous-agent parce que le `task_output` a ete nettoye par le garbage collector
-- Un cron job qui relance un agent "si pas de resultat recent", sans verifier si un resultat a deja ete produit et archive
+```
+Signal → Command written → Executor reads → Execution → End
+                                                         ↓
+                                                    status = IDLE
+                                                         ↓
+                                               Refresh sees IDLE
+                                                         ↓
+                                               Re-writes the command
+                                                         ↓
+                                               Executor re-executes → LOOP
+```
+
+The fundamental problem is the **absence of an explicit state machine**. The system uses a boolean (`has_active_task`) instead of a 4-value enum (`IDLE → PENDING → EXECUTING → COMPLETED`). When `has_active_task` goes back to `False` after completion, it is indistinguishable from "never executed".
+
+Variants include:
+- A LangChain orchestrator that re-dispatches a task because the result was consumed (the callback read and deleted it)
+- A CrewAI agent that re-delegates a task to a sub-agent because the `task_output` was cleared by the garbage collector
+- A cron job that restarts an agent "if no recent result", without checking whether a result was already produced and archived
 
 ## 4. Detection
 
-### 4.1 Detection manuelle (audit code)
+### 4.1 Manual code audit
 
-Chercher les patterns de refresh/retry qui ne trackent pas l'historique d'execution :
+Look for refresh/retry patterns that do not track execution history:
 
 ```bash
-# Chercher les boucles de retry basees sur un statut booleen
+# Look for retry loops based on a boolean status
 grep -rn "while.*not.*done\|if.*status.*idle\|if not.*active" --include="*.py"
 
-# Chercher les mecanismes de re-envoi de commandes
+# Look for command re-send mechanisms
 grep -rn "refresh.*command\|retry.*send\|re.*dispatch" --include="*.py"
 
-# Chercher les fichiers/flags effaces apres execution (perte de memoire)
+# Look for files/flags deleted after execution (loss of memory)
 grep -rn "os\.remove\|\.unlink\|delete.*after" --include="*.py"
 ```
 
-Verifier pour chaque occurrence : est-ce que le code distingue "jamais execute" de "execute et termine" ?
+For each match, verify: does the code distinguish "never executed" from "executed and completed"?
 
-### 4.2 Detection automatisee (CI/CD)
+### 4.2 Automated CI/CD
 
-Ajouter un test d'integration qui simule le cycle complet commande → execution → fin → verification que le refresh ne re-envoie pas :
+Add an integration test that simulates the full cycle command → execution → completion → verification that the refresh does not re-send:
 
 ```python
 def test_no_rapid_fire_after_completion():
@@ -101,9 +101,9 @@ def test_no_rapid_fire_after_completion():
     )
 ```
 
-### 4.3 Detection runtime (production)
+### 4.3 Runtime production
 
-Compter les executions par identifiant de tache dans une fenetre glissante :
+Count executions per task identifier within a sliding window:
 
 ```python
 import time
@@ -141,11 +141,11 @@ def execute_task(task_id: str, payload: dict):
     # ... actual execution
 ```
 
-## 5. Correction
+## 5. Fix
 
-### 5.1 Fix immediat
+### 5.1 Immediate fix
 
-Ajouter un cooldown entre deux executions de la meme tache :
+Add a cooldown between two executions of the same task:
 
 ```python
 import time
@@ -163,20 +163,20 @@ def should_execute(task_id: str) -> bool:
     return True
 ```
 
-### 5.2 Fix robuste
+### 5.2 Robust fix
 
-Implementer une state machine explicite pour chaque commande :
+Implement an explicit state machine for each command:
 
 ```python
 from enum import Enum
 from datetime import datetime, timezone
 
 class TaskState(Enum):
-    PENDING = "pending"       # Commande creee, pas encore lue par l'executeur
-    EXECUTING = "executing"   # Executeur a commence le traitement
-    COMPLETED = "completed"   # Traitement termine avec succes
-    FAILED = "failed"         # Traitement echoue
-    EXPIRED = "expired"       # Timeout depasse sans execution
+    PENDING = "pending"       # Command created, not yet read by the executor
+    EXECUTING = "executing"   # Executor has started processing
+    COMPLETED = "completed"   # Processing finished successfully
+    FAILED = "failed"         # Processing failed
+    EXPIRED = "expired"       # Timeout exceeded without execution
 
 class TaskTracker:
     """Tracks the lifecycle of each task. Refresh only re-sends PENDING tasks."""
@@ -219,50 +219,50 @@ class TaskTracker:
         return True
 ```
 
-## 6. Prevention architecturale
+## 6. Architectural Prevention
 
-Le pattern de prevention est la **state machine explicite avec identifiant unique par commande**. Chaque commande recoit un UUID a la creation. L'executeur confirme l'execution en renvoyant cet UUID. Le refresh ne re-envoie que les commandes dont l'UUID n'a pas ete confirme.
+The prevention pattern is an **explicit state machine with a unique identifier per command**. Each command is assigned a UUID at creation time. The executor confirms execution by returning that UUID. The refresh only re-sends commands whose UUID has not been confirmed.
 
-Cette architecture elimine le probleme a la racine : il n'y a plus d'ambiguite entre "pas encore execute" et "execute et termine". L'UUID sert de preuve d'execution.
+This architecture eliminates the problem at its root: there is no longer any ambiguity between "not yet executed" and "executed and completed". The UUID serves as proof of execution.
 
-En complement, un **budget d'execution par fenetre de temps** agit comme filet de securite. Meme si la state machine a un bug, le budget empeche plus de N executions de la meme tache par heure. C'est le circuit breaker de dernier recours.
+As a complement, an **execution budget per time window** acts as a safety net. Even if the state machine has a bug, the budget prevents more than N executions of the same task per hour. This is the last-resort circuit breaker.
 
-Enfin, le mecanisme de refresh ne devrait jamais etre le seul moyen de declencher une execution. Si l'executeur a besoin d'une nouvelle tache, il la **demande** (pull) au lieu de la recevoir passivement (push). Le pull elimine les refresh zombies car c'est l'executeur qui controle le rythme.
+Finally, the refresh mechanism should never be the only way to trigger an execution. If the executor needs a new task, it **requests** one (pull) rather than receiving it passively (push). Pull eliminates refresh zombies because the executor controls the pace.
 
-## 7. Anti-patterns a eviter
+## 7. Anti-patterns to Avoid
 
-1. **Utiliser un booleen pour tracker l'etat d'une commande.** `is_active = True/False` ne peut pas distinguer 4 etats (pending, executing, completed, failed). Utiliser un enum ou un string avec des valeurs explicites.
+1. **Using a boolean to track command state.** `is_active = True/False` cannot distinguish 4 states (pending, executing, completed, failed). Use an enum or a string with explicit values.
 
-2. **Supprimer le fichier de commande apres execution.** L'absence de fichier est ambigue : "jamais cree" ou "cree et supprime apres execution" ? Toujours garder une trace de completion.
+2. **Deleting the command file after execution.** The absence of a file is ambiguous: "never created" or "created and deleted after execution"? Always keep a completion trace.
 
-3. **Refresh base sur un timer sans memoire.** "Toutes les 10 secondes, verifier si une tache est active" sans tracker si la tache a deja ete executee est la recette du rapid-fire.
+3. **Timer-based refresh with no memory.** "Every 10 seconds, check if a task is active" without tracking whether the task has already been executed is the recipe for rapid-fire.
 
-4. **Pas de limite d'executions par tache.** Meme avec une state machine correcte, un hard cap (ex: max 3 executions par tache) previent les boucles infinies en cas de bug.
+4. **No execution limit per task.** Even with a correct state machine, a hard cap (e.g., max 3 executions per task) prevents infinite loops in case of a bug.
 
-5. **Logger "execution reussie" sans compter.** Si le log dit "task executed successfully" 200 fois en une heure pour la meme tache, c'est un bug — mais personne ne le voit sans compteur.
+5. **Logging "execution succeeded" without counting.** If the log says "task executed successfully" 200 times in one hour for the same task, that is a bug — but nobody sees it without a counter.
 
-## 8. Cas limites et variantes
+## 8. Edge Cases and Variants
 
-**Variante 1 : Retry apres echec qui ne detecte pas le succes partiel.** L'agent execute 80% d'une tache, echoue sur les 20% restants. Le retry relance la tache entiere, incluant les 80% deja faits. Resultat : actions dupliquees (emails envoyes deux fois, donnees inserees en double).
+**Variant 1: Retry after failure that does not detect partial success.** The agent executes 80% of a task and fails on the remaining 20%. The retry restarts the entire task, including the 80% already done. Result: duplicated actions (emails sent twice, data inserted twice).
 
-**Variante 2 : Callback perdu.** L'executeur termine la tache et envoie un callback "done". Le callback est perdu (reseau, queue pleine, crash du recepteur). L'orchestrateur ne recoit jamais la confirmation et re-envoie. Cela necessite un mecanisme d'idempotence cote executeur.
+**Variant 2: Lost callback.** The executor completes the task and sends a "done" callback. The callback is lost (network issue, full queue, receiver crash). The orchestrator never receives the confirmation and re-sends. This requires an idempotency mechanism on the executor side.
 
-**Variante 3 : Race condition temporelle.** L'executeur termine a T=10.001s. Le refresh se declenche a T=10.000s, juste avant la completion. Il re-envoie la commande parce qu'au moment du check, la tache etait encore "en cours". Cela necessite un lock entre le refresh et le callback de completion.
+**Variant 3: Temporal race condition.** The executor finishes at T=10.001s. The refresh triggers at T=10.000s, just before completion. It re-sends the command because at the time of the check, the task was still "in progress". This requires a lock between the refresh and the completion callback.
 
-**Variante 4 : Cascade d'agents.** L'agent A declenche l'agent B. L'agent B echoue et retourne un signal a l'agent A. L'agent A re-declenche l'agent B. L'agent B echoue a nouveau. Sans limite de profondeur, c'est une boucle a deux acteurs.
+**Variant 4: Agent cascade.** Agent A triggers agent B. Agent B fails and returns a signal to agent A. Agent A re-triggers agent B. Agent B fails again. Without a depth limit, this is a two-actor loop.
 
-## 9. Checklist d'audit
+## 9. Audit Checklist
 
-- [ ] Chaque commande/tache a une state machine explicite (pas un booleen)
-- [ ] Le refresh ne re-envoie que les taches en etat PENDING (jamais COMPLETED ou EXECUTING)
-- [ ] Un cooldown ou un compteur limite les executions de la meme tache
-- [ ] Le monitoring compte les executions par tache et alerte si > N en T secondes
-- [ ] Les tests d'integration verifient que completion → refresh ne re-execute pas
+- [ ] Every command/task has an explicit state machine (not a boolean)
+- [ ] The refresh only re-sends tasks in PENDING state (never COMPLETED or EXECUTING)
+- [ ] A cooldown or counter limits executions of the same task
+- [ ] Monitoring counts executions per task and alerts if > N in T seconds
+- [ ] Integration tests verify that completion → refresh does not re-execute
 
-## 10. Pour aller plus loin
+## 10. Further Reading
 
-- Pattern court correspondant : [Pattern 02 — Rapid-Fire Loop](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-02)
-- Patterns connexes : #09 (Agent Infinite Loop — boucle au niveau de l'agent lui-meme, pas du refresh), #03 (Cascade de Penalites — les re-executions repetees peuvent cumuler des penalites)
-- Lectures recommandees :
-  - "Designing Data-Intensive Applications" (Martin Kleppmann, 2017), chapitre 11 sur l'idempotence et le exactly-once processing
-  - Documentation LangChain sur les retry policies et les RunnableWithFallbacks — ou ce pattern exact est documente comme un piege connu
+- Short pattern: [Pattern 02 — Rapid-Fire Loop](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-02)
+- Related patterns: #09 (Agent Infinite Loop — loop at the agent level itself, not the refresh), #03 (Penalty Cascade — repeated re-executions can accumulate penalties)
+- Recommended reading:
+  - "Designing Data-Intensive Applications" (Martin Kleppmann, 2017), chapter 11 on idempotence and exactly-once processing
+  - LangChain documentation on retry policies and RunnableWithFallbacks — where this exact pattern is documented as a known pitfall

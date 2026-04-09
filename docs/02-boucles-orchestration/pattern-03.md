@@ -1,71 +1,71 @@
-# Pattern N°03 — Cascade de Penalites (Effet Multiplicatif)
+# Pattern #03 — Penalty Cascade (Multiplicative Effect)
 
-**Categorie :** Boucles & Orchestration
-**Severite :** High
-**Frameworks impactes :** LangChain / CrewAI / AutoGen / LangGraph / Custom
-**Temps moyen de debogage si non detecte :** 3 a 14 jours (le systeme tourne mais sous-performe ; la cause est rarement recherchee dans les ajustements de parametres)
+**Category:** Loops & Orchestration
+**Severity:** High
+**Affected frameworks:** LangChain / CrewAI / AutoGen / LangGraph / Custom
+**Average debugging time if undetected:** 3 to 14 days (the system keeps running but underperforms; the root cause is rarely traced back to parameter adjustments)
 
 ---
 
-## 1. Symptome observable
+## 1. Observable Symptoms
 
-Un parametre critique du systeme (budget de tokens, timeout, score de confiance, taille de batch) tombe a une valeur **absurdement basse** sans qu'aucune erreur n'apparaisse. Le systeme continue de fonctionner — il ne crashe pas, ne leve aucune exception — mais ses resultats sont negligeables.
+A critical system parameter (token budget, timeout, confidence score, batch size) drops to an **absurdly low value** with no error raised. The system keeps running — it does not crash, it raises no exception — but its output is negligible.
 
-Un budget de tokens de 4000 tombe a 280. Un timeout de 30 secondes tombe a 2.1 secondes. Un seuil de confiance de 0.25 tombe a 0.018. Les actions sont techniquement executees mais avec des parametres si bas que le resultat est inutile : les reponses LLM sont tronquees, les requetes expirent avant d'aboutir, les scores sont tous en dessous du seuil.
+A token budget of 4000 drops to 280. A 30-second timeout drops to 2.1 seconds. A confidence threshold of 0.25 drops to 0.018. Actions are technically executed but with parameters so low that the result is useless: LLM responses are truncated, requests time out before completing, scores all fall below the threshold.
 
-Le symptome est intermittent. Il se manifeste quand **plusieurs conditions negatives coincident** : un jour specifique de la semaine, pendant les heures creuses, apres une serie d'echecs. Chaque condition declenche independamment un ajustement raisonnable. C'est leur combinaison simultanee qui cree la catastrophe.
+The symptom is intermittent. It manifests when **several negative conditions coincide**: a specific day of the week, during off-peak hours, after a series of failures. Each condition independently triggers a reasonable adjustment. Their simultaneous combination creates the failure.
 
-## 2. Histoire vecue (anonymisee)
+## 2. Field Story (anonymized)
 
-Un pipeline d'analyse de donnees multi-agents utilisait 5 modules qui ajustaient dynamiquement le budget de tokens LLM en fonction des conditions du moment. Un module reduisait de 20% le mardi (historiquement le jour le plus bruite). Un autre reduisait de 50% apres 3 erreurs consecutives. Un troisieme reduisait de 30% en dehors des heures de bureau. Un quatrieme reduisait de 50% si le taux d'erreur global depassait 5%. Un cinquieme reduisait de 50% pendant la maintenance nocturne.
+A multi-agent data analysis pipeline used 5 modules that dynamically adjusted the LLM token budget based on current conditions. One module reduced it by 20% on Tuesdays (historically the noisiest day). Another reduced it by 50% after 3 consecutive errors. A third reduced it by 30% outside business hours. A fourth reduced it by 50% if the overall error rate exceeded 5%. A fifth reduced it by 50% during nightly maintenance.
 
-Un mardi soir a 23h, apres une serie d'erreurs, les 5 modules ont triggue simultanement : `0.8 x 0.5 x 0.7 x 0.5 x 0.5 = 0.07`. Le budget est tombe a 7% de sa valeur nominale — de 4000 tokens a 280. Les reponses du LLM etaient tronquees en mid-sentence, rendant les analyses inutilisables. Le systeme a tourne dans cet etat pendant 6 heures avant que l'alerte de qualite ne se declenche le lendemain matin.
+On a Tuesday night at 11 PM, after a series of errors, all 5 modules triggered simultaneously: `0.8 x 0.5 x 0.7 x 0.5 x 0.5 = 0.07`. The budget dropped to 7% of its nominal value — from 4000 tokens to 280. LLM responses were truncated mid-sentence, rendering the analyses unusable. The system ran in this state for 6 hours before a quality alert fired the next morning.
 
-## 3. Cause racine technique
+## 3. Technical Root Cause
 
-Le bug se produit quand **N modules ajustent le meme parametre independamment** dans le meme cycle de traitement. Chaque module fait un read-modify-write sans connaitre les ajustements des autres :
+The bug occurs when **N modules independently adjust the same parameter** within the same processing cycle. Each module performs a read-modify-write without awareness of the other modules' adjustments:
 
 ```python
-# Module 1 : ajustement temporel
+# Module 1: time-based adjustment
 config = load_config()
-config["token_budget"] *= 0.8  # Mardi = -20%
+config["token_budget"] *= 0.8  # Tuesday = -20%
 save_config(config)
 
-# Module 2 : ajustement erreurs (meme cycle, 2 secondes plus tard)
-config = load_config()  # Lit la valeur DEJA reduite par Module 1
-config["token_budget"] *= 0.5  # 3 erreurs = -50%
+# Module 2: error-based adjustment (same cycle, 2 seconds later)
+config = load_config()  # Reads the value ALREADY reduced by Module 1
+config["token_budget"] *= 0.5  # 3 errors = -50%
 save_config(config)
 
-# Module 3, 4, 5 : idem...
-# Resultat final : 0.8 * 0.5 * 0.7 * 0.5 * 0.5 = 0.07 du nominal
+# Modules 3, 4, 5: same pattern...
+# Final result: 0.8 * 0.5 * 0.7 * 0.5 * 0.5 = 0.07 of nominal
 ```
 
-Le probleme fondamental est que chaque module pense ajuster depuis la valeur **nominale**, alors qu'il ajuste depuis la valeur **deja reduite** par les modules precedents. Les multiplicateurs sont appliques en serie au lieu d'etre accumules puis appliques une seule fois.
+The fundamental problem is that each module believes it is adjusting from the **nominal** value, when in fact it is adjusting from the value **already reduced** by prior modules. Multipliers are applied in series instead of being accumulated and applied once.
 
-C'est un probleme de **commutativity brisee** : l'ordre d'execution des modules change le resultat. Si le module 1 s'execute avant le module 2, le resultat est different que si c'est l'inverse. Et comme l'ordre depend du scheduling, le bug peut apparaitre ou disparaitre de maniere apparemment aleatoire.
+This is a **broken commutativity** problem: the execution order of the modules changes the outcome. If module 1 runs before module 2, the result differs from the reverse order. And since the order depends on scheduling, the bug can appear or disappear in an apparently random fashion.
 
 ## 4. Detection
 
-### 4.1 Detection manuelle (audit code)
+### 4.1 Manual code audit
 
-Chercher les endroits ou un parametre est modifie par read-modify-write :
+Look for locations where a parameter is modified via read-modify-write:
 
 ```bash
-# Chercher les patterns de multiplication/division sur des parametres de config
+# Search for multiplication/division patterns on config parameters
 grep -rn "\*=\s*0\.\|/=\s*[0-9]" --include="*.py" | grep -i "config\|param\|budget\|threshold"
 
-# Chercher les ecritures multiples au meme fichier de config
+# Search for multiple writes to the same config file
 grep -rn "save_config\|write_config\|dump.*json" --include="*.py"
 
-# Compter combien de fichiers modifient le meme parametre
+# Count how many files modify the same parameter
 grep -rln "token_budget\|risk_percent\|timeout" --include="*.py" | wc -l
 ```
 
-Si > 2 fichiers modifient le meme parametre, c'est un candidat pour la cascade.
+If more than 2 files modify the same parameter, it is a cascade candidate.
 
-### 4.2 Detection automatisee (CI/CD)
+### 4.2 Automated CI/CD
 
-Ajouter un test qui simule l'execution de tous les modules d'ajustement et verifie que le parametre ne descend pas en dessous d'un floor :
+Add a test that simulates all adjustment modules running and verifies the parameter does not drop below a floor:
 
 ```python
 def test_parameter_floor_after_all_adjustments():
@@ -83,9 +83,9 @@ def test_parameter_floor_after_all_adjustments():
         )
 ```
 
-### 4.3 Detection runtime (production)
+### 4.3 Runtime production
 
-Logger chaque ajustement avec sa source et detecter les cascades en temps reel :
+Log each adjustment with its source and detect cascades in real time:
 
 ```python
 import time
@@ -125,16 +125,16 @@ class CascadeDetector:
         return {"cascade": False}
 ```
 
-## 5. Correction
+## 5. Fix
 
-### 5.1 Fix immediat
+### 5.1 Immediate fix
 
-Ajouter un floor absolu a chaque parametre. Quelles que soient les reductions, le parametre ne descend jamais en dessous de X% du nominal :
+Add a hard floor to each parameter. Regardless of reductions, the parameter never drops below X% of nominal:
 
 ```python
 FLOORS = {
     "token_budget": 1000,    # Minimum 1000 tokens
-    "timeout": 5.0,          # Minimum 5 secondes
+    "timeout": 5.0,          # Minimum 5 seconds
     "confidence": 0.1,       # Minimum 10%
 }
 
@@ -145,9 +145,9 @@ def safe_adjust(param: str, current: float, multiplier: float) -> float:
     return max(adjusted, floor)
 ```
 
-### 5.2 Fix robuste
+### 5.2 Robust fix
 
-Remplacer les read-modify-write independants par un **pipeline accumulatif** :
+Replace independent read-modify-write operations with an **accumulative pipeline**:
 
 ```python
 from dataclasses import dataclass, field
@@ -190,46 +190,46 @@ pipeline.propose("night_module", 0.7, "Off-hours")
 result = pipeline.compute()  # final = 4000 * 0.3 = 1200 (floored), not 4000 * 0.28 = 1120
 ```
 
-## 6. Prevention architecturale
+## 6. Architectural Prevention
 
-La prevention repose sur un principe : **les modules ne modifient jamais un parametre directement**. Ils soumettent des propositions d'ajustement a un pipeline centralise qui les agrege et les applique une seule fois par cycle.
+Prevention rests on one principle: **modules never modify a parameter directly**. They submit adjustment proposals to a centralized pipeline that aggregates them and applies the result once per cycle.
 
-Ce pipeline agit comme un **middleware de config** : il recoit les propositions de N modules, calcule le multiplicateur cumule, applique un floor configurable, et ecrit le resultat final. Les modules n'ont aucun acces en ecriture directe au parametre.
+This pipeline acts as a **config middleware**: it receives proposals from N modules, computes the cumulative multiplier, applies a configurable floor, and writes the final value. Modules have no direct write access to the parameter.
 
-En complement, l'audit trail du pipeline (quel module a propose quel ajustement, et quel a ete le resultat final) permet de diagnostiquer immediatement pourquoi un parametre est bas. Au lieu de chercher dans 5 fichiers differents, tout est centralise dans un log unique.
+Additionally, the pipeline's audit trail (which module proposed which adjustment, and what the final result was) enables immediate diagnosis of why a parameter is low. Instead of searching across 5 separate files, everything is centralized in a single log.
 
-## 7. Anti-patterns a eviter
+## 7. Anti-patterns to Avoid
 
-1. **Read-modify-write independant sur un parametre partage.** C'est la cause directe de la cascade. Chaque module doit proposer un ajustement relatif, pas ecrire une valeur absolue.
+1. **Independent read-modify-write on a shared parameter.** This is the direct cause of the cascade. Each module must propose a relative adjustment, not write an absolute value.
 
-2. **Pas de floor sur les parametres critiques.** Un token budget de 0 ou un timeout de 0.1s sont des valeurs qui cassent le systeme. Chaque parametre doit avoir un minimum defini.
+2. **No floor on critical parameters.** A token budget of 0 or a timeout of 0.1s are values that break the system. Every parameter must have a defined minimum.
 
-3. **Multiplicateurs non bornes.** Un module qui applique `*= 0.01` peut a lui seul reduire un parametre a 1% du nominal. Chaque multiplicateur individuel doit etre clampe (ex: entre 0.3 et 2.0).
+3. **Unbounded multipliers.** A module applying `*= 0.01` can on its own reduce a parameter to 1% of nominal. Each individual multiplier must be clamped (e.g., between 0.3 and 2.0).
 
-4. **Pas d'audit trail des ajustements.** Sans log de qui a modifie quoi et quand, le diagnostic d'une cascade est un cauchemar. Logger chaque ajustement avec source, ancien valeur, nouvelle valeur, et timestamp.
+4. **No audit trail for adjustments.** Without a log of who changed what and when, diagnosing a cascade is a nightmare. Log every adjustment with source, old value, new value, and timestamp.
 
-5. **Tester les modules d'ajustement en isolation.** Chaque module teste separement fonctionne parfaitement. C'est la combinaison qui cree le bug. Le test de cascade doit simuler l'execution simultanee de tous les modules.
+5. **Testing adjustment modules in isolation.** Each module tested separately works perfectly. The combination is what creates the bug. The cascade test must simulate all modules firing simultaneously.
 
-## 8. Cas limites et variantes
+## 8. Edge Cases and Variants
 
-**Variante 1 : Cascade ascendante.** Au lieu de reduire, les modules augmentent un parametre (ex: timeout, budget). Le timeout passe de 30s a 300s, les requetes prennent 5 minutes chacune, le systeme est techniquement fonctionnel mais extremement lent.
+**Variant 1: Upward cascade.** Instead of reducing, modules increase a parameter (e.g., timeout, budget). The timeout climbs from 30s to 300s, requests each take 5 minutes, and the system is technically functional but extremely slow.
 
-**Variante 2 : Cascade sur des parametres interdependants.** Le module A reduit le budget de tokens. Le module B augmente le nombre de retries parce que les reponses sont tronquees (budget trop bas). Le module C reduit encore le budget parce que le nombre de retries est trop eleve. Boucle de retroaction qui amplifie la cascade.
+**Variant 2: Cascade on interdependent parameters.** Module A reduces the token budget. Module B increases the retry count because responses are truncated (budget too low). Module C further reduces the budget because the retry count is too high. A feedback loop that amplifies the cascade.
 
-**Variante 3 : Cascade temporelle.** Les modules ne trigguent pas dans le meme cycle mais sur des cycles successifs. Le parametre descend de 5% par cycle, trop lentement pour declencher une alerte instantanee, mais apres 50 cycles il est a 7% du nominal. La "cascade lente" est la plus difficile a detecter.
+**Variant 3: Temporal cascade.** Modules do not trigger in the same cycle but on successive cycles. The parameter drops by 5% per cycle, too slowly to fire an instant alert, but after 50 cycles it is at 7% of nominal. The "slow cascade" is the hardest to detect.
 
-## 9. Checklist d'audit
+## 9. Audit Checklist
 
-- [ ] Chaque parametre critique a un floor absolu defini et documente
-- [ ] Les modules d'ajustement proposent des multiplicateurs au lieu d'ecrire des valeurs absolues
-- [ ] Un pipeline centralise agrege les ajustements et applique un floor cumulatif
-- [ ] L'audit trail enregistre chaque ajustement (source, ancien, nouveau, timestamp)
-- [ ] Un test d'integration simule le worst case (tous les modules trigguent) et verifie le floor
+- [ ] Every critical parameter has an absolute floor defined and documented
+- [ ] Adjustment modules propose multipliers instead of writing absolute values
+- [ ] A centralized pipeline aggregates adjustments and applies a cumulative floor
+- [ ] The audit trail records every adjustment (source, old value, new value, timestamp)
+- [ ] An integration test simulates the worst case (all modules fire) and verifies the floor
 
-## 10. Pour aller plus loin
+## 10. Further Reading
 
-- Pattern court correspondant : [Pattern 03 — Cascade de Penalites](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-03)
-- Patterns connexes : #11 (Race Condition on Shared File — les read-modify-write concurrents sont le meme mecanisme), #10 (Survival Mode Deadlock — une cascade qui reduit un seuil de confiance peut mener au deadlock)
-- Lectures recommandees :
-  - "Release It!" (Michael T. Nygard, 2018), chapitre sur les cascading failures et les stability patterns
-  - Documentation CrewAI sur la gestion de config partagee entre agents — la section "shared state pitfalls"
+- Short pattern: [Pattern 03 — Cascade de Penalites](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-03)
+- Related patterns: #11 (Race Condition on Shared File — concurrent read-modify-writes are the same mechanism), #10 (Survival Mode Deadlock — a cascade reducing a confidence threshold can lead to deadlock)
+- Recommended reading:
+  - "Release It!" (Michael T. Nygard, 2018), chapter on cascading failures and stability patterns
+  - CrewAI documentation on shared config management between agents — the "shared state pitfalls" section

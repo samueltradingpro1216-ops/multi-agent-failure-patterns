@@ -1,71 +1,71 @@
-# Pattern N°08 — Data Pipeline Freeze
+# Pattern #08 — Data Pipeline Freeze
 
-**Categorie :** I/O & Persistence
-**Severite :** High
-**Frameworks impactes :** LangChain / CrewAI / AutoGen / LangGraph / Custom
-**Temps moyen de debogage si non detecte :** 5 a 30 jours (les donnees gelees produisent des resultats plausibles mais obsoletes — le probleme n'est pas cherche tant que les resultats semblent raisonnables)
+**Category:** I/O & Persistence
+**Severity:** High
+**Impacted frameworks:** LangChain / CrewAI / AutoGen / LangGraph / Custom
+**Average debugging time if undetected:** 5 to 30 days (frozen data produces plausible but stale results — the problem is not investigated as long as results appear reasonable)
 
 ---
 
-## 1. Symptome observable
+## 1. Observable Symptoms
 
-Un dashboard, un rapport, ou un module d'analyse affiche des donnees qui n'ont pas change depuis des jours ou des semaines. Les metriques derivees (moyennes, tendances, scores) sont toutes **stables** — ce qui semble positif mais est en realite le signe que les donnees sous-jacentes ne sont plus alimentees.
+A dashboard, report, or analytics module displays data that has not changed in days or weeks. Derived metrics (averages, trends, scores) are all **stable** — which appears positive but is in fact a sign that the underlying data is no longer being fed.
 
-Le symptome trompeur : le consommateur ne crashe pas. Il lit un fichier ou une table qui **existe** et contient des donnees valides — elles sont juste anciennes. Les calculs s'executent normalement, les rapports sont generes a l'heure, et les metriques sont dans des plages normales. C'est la **date** des donnees qui est fausse, pas les donnees elles-memes.
+The deceptive symptom: the consumer does not crash. It reads a file or table that **exists** and contains valid data — it is simply old. Computations run normally, reports are generated on schedule, and metrics fall within normal ranges. It is the **date** of the data that is wrong, not the data itself.
 
-Le producteur, de son cote, fonctionne aussi normalement. Il ecrit ses donnees — mais dans un **format ou un chemin different** de ce que le consommateur attend. Les deux composants tournent en parallele, sans erreur, sans se parler.
+The producer, on its side, also runs normally. It writes its data — but to a **different format or path** than what the consumer expects. Both components run in parallel, with no errors, without communicating with each other.
 
-## 2. Histoire vecue (anonymisee)
+## 2. Field Story (anonymized)
 
-Un systeme de monitoring multi-agents analysait les performances de ses agents toutes les heures. Le module d'analyse lisait les resultats depuis un fichier JSONL. Le module producteur, apres une refonte, est passe au format CSV sans modifier le consommateur.
+A multi-agent monitoring system analyzed its agents' performance every hour. The analytics module read results from a JSONL file. After a refactor, the producer module switched to CSV format without updating the consumer.
 
-Le fichier JSONL existait toujours — il contenait les donnees d'avant la refonte. Le consommateur le lisait normalement, calculait des metriques, et produisait des rapports. Pendant 11 jours, les rapports affichaient des metriques basees sur des donnees de 11 jours. L'equipe n'a rien remarque car les metriques etaient dans des plages normales (elles correspondaient a la realite d'il y a 11 jours).
+The JSONL file still existed — it contained the data from before the refactor. The consumer read it normally, computed metrics, and produced reports. For 11 days, reports displayed metrics based on 11-day-old data. The team noticed nothing because the metrics were within normal ranges (they matched the reality of 11 days prior).
 
-Le bug a ete decouvert quand un membre de l'equipe a remarque que le nombre total de resultats n'avait pas augmente en 11 jours. En verifiant, le fichier JSONL n'avait pas ete modifie depuis la date de la refonte. Le producteur ecrivait dans un CSV que personne ne lisait.
+The bug was discovered when a team member noticed that the total number of results had not increased in 11 days. Upon investigation, the JSONL file had not been modified since the date of the refactor. The producer was writing to a CSV that nobody was reading.
 
-## 3. Cause racine technique
+## 3. Technical Root Cause
 
-Le bug se produit quand le **contrat implicite** entre un producteur et un consommateur est rompu sans que les deux parties le sachent :
+The bug occurs when the **implicit contract** between a producer and a consumer is broken without either party knowing:
 
 ```
-AVANT la refonte:
-    Producteur → data/results.jsonl → Consommateur
-    (contrat: format JSONL, 1 ligne par resultat)
+BEFORE the refactor:
+    Producer → data/results.jsonl → Consumer
+    (contract: JSONL format, 1 line per result)
 
-APRES la refonte:
-    Producteur → data/results.csv    → (personne ne lit)
-    Consommateur → data/results.jsonl → (fichier gele, derniere modification: 11 jours)
+AFTER the refactor:
+    Producer → data/results.csv    → (nobody reads this)
+    Consumer → data/results.jsonl → (frozen file, last modified: 11 days ago)
 ```
 
-Le contrat est "implicite" parce qu'il n'est encode nulle part. Il n'y a pas de schema versionne, pas de verification de format, pas de test d'integration qui valide le flux complet. Le producteur assume que le consommateur lira le CSV. Le consommateur assume que le JSONL sera alimente.
+The contract is "implicit" because it is not encoded anywhere. There is no versioned schema, no format validation, no integration test that validates the full pipeline. The producer assumes the consumer will read the CSV. The consumer assumes the JSONL will be kept up to date.
 
-Les causes courantes de rupture de contrat :
-- Changement de format de fichier (JSONL → CSV, JSON → Parquet)
-- Changement de chemin ou de nom de fichier
-- Changement de schema (nouvelles colonnes, colonnes renommees)
-- Changement de frequence d'ecriture (horaire → quotidien)
-- Migration de stockage (fichier local → base de donnees → API)
+Common causes of contract breakage:
+- File format change (JSONL → CSV, JSON → Parquet)
+- File path or name change
+- Schema change (new columns, renamed columns)
+- Write frequency change (hourly → daily)
+- Storage migration (local file → database → API)
 
 ## 4. Detection
 
-### 4.1 Detection manuelle (audit code)
+### 4.1 Manual code audit
 
-Pour chaque pipeline de donnees, verifier que producteur et consommateur pointent vers la meme source :
+For each data pipeline, verify that producer and consumer point to the same source:
 
 ```bash
-# Lister tous les chemins de fichiers ecrits
+# List all file paths written
 grep -rn "open.*'w'\|write_text\|to_csv\|to_json" --include="*.py" | grep -v test
 
-# Lister tous les chemins de fichiers lus
+# List all file paths read
 grep -rn "open.*'r'\|read_text\|read_csv\|read_json\|load" --include="*.py" | grep -v test
 
-# Croiser les deux listes — les chemins ecrits mais jamais lus sont suspects
-# Les chemins lus mais jamais ecrits sont des pipelines gelees potentielles
+# Cross-reference the two lists — paths written but never read are suspicious
+# Paths read but never written are potential frozen pipelines
 ```
 
-### 4.2 Detection automatisee (CI/CD)
+### 4.2 Automated CI/CD
 
-Documenter les pipelines et tester le flux complet a chaque deploiement :
+Document pipelines and test the full flow on every deployment:
 
 ```python
 # test_pipeline_contract.py
@@ -94,9 +94,9 @@ def test_pipeline_contract_alignment():
         )
 ```
 
-### 4.3 Detection runtime (production)
+### 4.3 Runtime production
 
-Verifier la fraicheur des donnees a chaque lecture :
+Verify data freshness on every read:
 
 ```python
 import os
@@ -136,15 +136,15 @@ if not result["fresh"]:
     send_alert(f"Data pipeline frozen: results.jsonl {result['reason']}")
 ```
 
-## 5. Correction
+## 5. Fix
 
-### 5.1 Fix immediat
+### 5.1 Immediate fix
 
-Realigner producteur et consommateur sur le meme chemin et format :
+Realign producer and consumer on the same path and format:
 
 ```python
-# Identifier le format actuel du producteur
-# Si producteur ecrit en CSV, modifier le consommateur pour lire en CSV :
+# Identify the producer's current format
+# If producer writes CSV, update the consumer to read CSV:
 import csv
 
 def read_results(filepath: str) -> list[dict]:
@@ -160,9 +160,9 @@ def read_results(filepath: str) -> list[dict]:
         raise ValueError(f"Unknown format: {filepath}")
 ```
 
-### 5.2 Fix robuste
+### 5.2 Robust fix
 
-Ajouter un contrat explicite entre producteur et consommateur avec versioning :
+Add an explicit contract between producer and consumer with versioning:
 
 ```python
 """pipeline_contract.py — Explicit contract between producer and consumer."""
@@ -210,50 +210,50 @@ class PipelineContract:
         return {"valid": True, "records": meta["record_count"], "age_hours": age.total_seconds() / 3600}
 ```
 
-## 6. Prevention architecturale
+## 6. Architectural Prevention
 
-La prevention repose sur trois principes :
+Prevention rests on three principles:
 
-**1. Contrat explicite.** Chaque pipeline a un fichier de metadata (`.meta.json`) qui definit le format, la version, et le timestamp de derniere mise a jour. Le consommateur valide le contrat avant chaque lecture. Si le format ou la version ne correspond pas, il refuse de lire et alerte.
+**1. Explicit contract.** Every pipeline has a metadata file (`.meta.json`) that defines the format, version, and last-updated timestamp. The consumer validates the contract before each read. If the format or version does not match, it refuses to read and raises an alert.
 
-**2. Test d'integration end-to-end.** A chaque deploiement, un test ecrit des donnees via le producteur, les lit via le consommateur, et verifie que le resultat est correct. Ce test detecte immediatement tout changement de format, chemin, ou schema.
+**2. End-to-end integration test.** On every deployment, a test writes data through the producer, reads it through the consumer, and verifies the result is correct. This test immediately catches any change to format, path, or schema.
 
-**3. Monitoring de fraicheur.** Un health check periodique verifie que chaque fichier de donnees a ete mis a jour dans les N dernieres heures. Si un fichier est stale, c'est une alerte immediate — pas un rapport quotidien.
+**3. Freshness monitoring.** A periodic health check verifies that each data file has been updated within the last N hours. If a file is stale, this triggers an immediate alert — not a daily report.
 
-## 7. Anti-patterns a eviter
+## 7. Anti-patterns to Avoid
 
-1. **Changer le format du producteur sans toucher le consommateur.** Toute modification du producteur doit inclure la verification que le consommateur est compatible.
+1. **Changing the producer's format without touching the consumer.** Any modification to the producer must include verification that the consumer remains compatible.
 
-2. **Pas de timestamp dans les fichiers de donnees.** Sans timestamp, il est impossible de distinguer "donnees fraiches" de "donnees gelees de 11 jours".
+2. **No timestamp in data files.** Without a timestamp, it is impossible to distinguish "fresh data" from "11-day-old frozen data".
 
-3. **Lire silencieusement un fichier vide comme "pas de donnees".** Un fichier vide peut signifier "rien ne s'est passe" (normal) ou "le producteur ecrit ailleurs" (bug). Distinguer les deux avec un metadata file.
+3. **Silently reading an empty file as "no data".** An empty file can mean "nothing happened" (normal) or "the producer is writing elsewhere" (bug). Distinguish the two with a metadata file.
 
-4. **Contrat de pipeline implicite.** Si le format n'est documente nulle part, tout changement est un breaking change invisible. Documenter explicitement : format, schema, frequence, chemin.
+4. **Implicit pipeline contract.** If the format is documented nowhere, any change is an invisible breaking change. Document explicitly: format, schema, frequency, path.
 
-5. **Tester producteur et consommateur separement.** Les tests unitaires du producteur verifient qu'il ecrit correctement. Les tests du consommateur verifient qu'il lit correctement. Aucun ne verifie qu'ils sont compatibles ensemble.
+5. **Testing producer and consumer separately.** Unit tests for the producer verify that it writes correctly. Tests for the consumer verify that it reads correctly. Neither verifies that both are mutually compatible.
 
-## 8. Cas limites et variantes
+## 8. Edge Cases and Variants
 
-**Variante 1 : Schema drift.** Le producteur ajoute une colonne au CSV. Le consommateur ignore les colonnes inconnues mais crashe si une colonne attendue est renommee ou supprimee. Le fichier est mis a jour (pas gele) mais les donnees sont incompatibles.
+**Variant 1: Schema drift.** The producer adds a column to the CSV. The consumer silently ignores unknown columns but crashes if an expected column is renamed or removed. The file is being updated (not frozen) but the data is incompatible.
 
-**Variante 2 : Pipeline freeze partielle.** Le producteur ecrit dans le bon fichier mais a un bug qui fait que les nouvelles lignes sont identiques aux anciennes (bug dans le generateur de donnees). Le fichier est techniquement "a jour" (modifie recemment) mais les donnees ne changent pas.
+**Variant 2: Partial pipeline freeze.** The producer writes to the correct file but has a bug that causes new rows to be identical to old ones (a bug in the data generator). The file is technically "up to date" (recently modified) but the data does not change.
 
-**Variante 3 : Changement de base de donnees.** Le producteur migre de fichier vers SQLite. L'ancien fichier n'est plus alimente mais le consommateur continue de le lire. C'est le meme pattern que le changement de format, applique a un changement de stockage.
+**Variant 3: Database storage change.** The producer migrates from file to SQLite. The old file is no longer updated but the consumer keeps reading it. This is the same pattern as a format change, applied to a storage migration.
 
-**Variante 4 : Pipeline gelée par un lock.** Le producteur essaie d'ecrire mais un lock file (d'un processus crashe) l'en empeche. Il echoue silencieusement et le fichier n'est jamais mis a jour. Le consommateur lit les anciennes donnees.
+**Variant 4: Pipeline frozen by a lock.** The producer attempts to write but a lock file (left by a crashed process) prevents it. It fails silently and the file is never updated. The consumer reads stale data.
 
-## 9. Checklist d'audit
+## 9. Audit Checklist
 
-- [ ] Chaque pipeline producteur → consommateur est documentee (chemin, format, frequence)
-- [ ] Chaque fichier de donnees a un metadata file avec format, version, et timestamp
-- [ ] Le consommateur verifie la fraicheur avant chaque lecture
-- [ ] Un test d'integration valide le flux complet producteur → consommateur
-- [ ] Le monitoring alerte si un fichier n'a pas ete mis a jour depuis > N heures
+- [ ] Every producer → consumer pipeline is documented (path, format, frequency)
+- [ ] Every data file has a metadata file with format, version, and timestamp
+- [ ] The consumer checks freshness before every read
+- [ ] An integration test validates the full producer → consumer flow
+- [ ] Monitoring alerts if a file has not been updated for more than N hours
 
-## 10. Pour aller plus loin
+## 10. Further Reading
 
-- Pattern court correspondant : [Pattern 08 — Data Pipeline Freeze](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-08)
-- Patterns connexes : #04 (Multi-File State Desync — un fichier gele est une forme de desync), #01 (Timezone Mismatch — un timestamp mal interprete peut masquer une pipeline freeze)
-- Lectures recommandees :
-  - "Designing Data-Intensive Applications" (Martin Kleppmann), chapitre 10 sur le batch processing et les contrats de schema
-  - Schema Registry de Confluent — le concept de contrat versionne entre producteurs et consommateurs applique a l'echelle
+- Corresponding short pattern: [Pattern 08 — Data Pipeline Freeze](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-08)
+- Related patterns: #04 (Multi-File State Desync — a frozen file is a form of desync), #01 (Timezone Mismatch — a misinterpreted timestamp can mask a pipeline freeze)
+- Recommended reading:
+  - "Designing Data-Intensive Applications" (Martin Kleppmann), chapter 10 on batch processing and schema contracts
+  - Confluent Schema Registry — the concept of a versioned contract between producers and consumers applied at scale

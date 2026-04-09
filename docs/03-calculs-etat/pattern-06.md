@@ -1,86 +1,86 @@
-# Pattern N°06 — Silent NameError in try/except
+# Pattern #06 — Silent NameError in try/except
 
-**Categorie :** Calculs & Etat
-**Severite :** High
-**Frameworks impactes :** LangChain / CrewAI / AutoGen / LangGraph / Custom
-**Temps moyen de debogage si non detecte :** 5 a 30 jours (la fonctionnalite affectee semble simplement "ne pas exister" — personne ne la cherche activement)
+**Category:** Computation & State
+**Severity:** High
+**Affected frameworks:** LangChain / CrewAI / AutoGen / LangGraph / Custom
+**Average debugging time if undetected:** 5 to 30 days (the affected feature simply appears to "not exist" — nobody actively looks for it)
 
 ---
 
-## 1. Symptome observable
+## 1. Observable Symptoms
 
-Une fonctionnalite critique du systeme **ne s'execute jamais** mais aucune erreur n'apparait dans les logs, le monitoring, ou le dashboard. Le systeme tourne normalement, les autres fonctionnalites marchent, et le composant defaillant est simplement invisible.
+A critical system feature **never executes**, yet no error appears in logs, monitoring, or dashboards. The system runs normally, all other features work, and the failing component is simply invisible.
 
-En inspectant les donnees, on decouvre qu'une branche entiere du code est morte depuis des semaines ou des mois. Un mecanisme d'urgence n'a jamais fonctionne. Un module de validation n'a jamais valide. Un clean-up periodique n'a jamais nettoye. Le code est la, il semble correct a la lecture, mais il ne tourne pas.
+Upon inspecting the data, one discovers that an entire branch of the code has been dead for weeks or months. An emergency mechanism never worked. A validation module never validated. A periodic clean-up never cleaned. The code is there, looks correct on inspection, but never runs.
 
-Le symptome le plus perfide : le bug ne se manifeste que **par l'absence de quelque chose**. Pas d'erreur, pas de crash, pas de log suspect. Juste une fonctionnalite qui devrait exister et qui n'existe pas. C'est le bug invisible par excellence.
+The most insidious symptom: the bug only manifests **through the absence of something**. No error, no crash, no suspicious log entry. Just a feature that should exist but does not. It is the archetypal invisible bug.
 
-## 2. Histoire vecue (anonymisee)
+## 2. Field Story (anonymized)
 
-Un systeme multi-agents avait un mecanisme d'arret d'urgence : quand un agent etait marque comme desactive, le superviseur devait forcer la fermeture de ses taches en cours. Le code existait depuis 6 mois.
+A multi-agent system had an emergency shutdown mechanism: when an agent was marked as disabled, the supervisor was supposed to force-close its in-progress tasks. The code had been in place for 6 months.
 
-Lors d'un incident, un agent desactive avait des taches actives qui continuaient de tourner. L'equipe a active le mecanisme d'urgence — rien ne s'est passe. En inspectant le code, ils ont trouve le bug : la variable `config` etait utilisee 30 lignes avant son assignation, dans un bloc `try/except Exception: pass`. Le `NameError` etait avale silencieusement a chaque cycle depuis 6 mois. Le mecanisme d'urgence n'avait **jamais fonctionne** — personne ne l'avait remarque parce qu'aucun incident ne l'avait necessairement sollicite avant.
+During an incident, a disabled agent had active tasks that kept running. The team activated the emergency mechanism — nothing happened. Inspecting the code, they found the bug: the variable `config` was used 30 lines before its assignment, inside a `try/except Exception: pass` block. The `NameError` had been silently swallowed on every cycle for 6 months. The emergency mechanism had **never worked** — nobody had noticed because no incident had strictly required it before.
 
-L'equipe a realise avec horreur que si l'incident avait ete plus grave, ils n'auraient eu aucun filet de securite.
+The team realized with horror that if the incident had been more severe, they would have had no safety net.
 
-## 3. Cause racine technique
+## 3. Technical Root Cause
 
-Le bug se produit quand une variable est **utilisee avant son assignation** dans un bloc `try/except` qui catch `Exception` ou est un bare `except:` :
+The bug occurs when a variable is **used before its assignment** inside a `try/except` block that catches `Exception` or uses a bare `except:`:
 
 ```python
 def process_agent(agent_id: str, is_disabled: bool):
     try:
-        # Etape 1: check urgence
+        # Step 1: emergency check
         if is_disabled:
-            if config.get("has_active_tasks"):   # NameError! 'config' n'existe pas
+            if config.get("has_active_tasks"):   # NameError! 'config' does not exist yet
                 force_shutdown(agent_id)
                 return
 
-        # ... 30 lignes de code ...
+        # ... 30 lines of code ...
 
-        # Etape 2: lire la config (APRES l'utilisation)
+        # Step 2: read config (AFTER it is used)
         config = read_config(agent_id)
 
-        # Etape 3: traitement normal
+        # Step 3: normal processing
         process(config)
 
     except Exception:
-        pass  # LE NAMEERROR EST AVALE ICI
+        pass  # THE NAMEERROR IS SWALLOWED HERE
 ```
 
-Le mecanisme est le suivant :
-1. Python entre dans le `try`
-2. A la ligne `config.get(...)`, `config` n'est pas defini → `NameError`
-3. Le `except Exception` catch le `NameError` (qui herite de `Exception`)
-4. Le `pass` ne fait rien — pas de log, pas d'alerte
-5. L'execution continue comme si la branche `if is_disabled` n'existait pas
+The mechanism is as follows:
+1. Python enters the `try` block
+2. At the line `config.get(...)`, `config` is not defined → `NameError`
+3. The `except Exception` catches the `NameError` (which inherits from `Exception`)
+4. The `pass` does nothing — no log, no alert
+5. Execution continues as if the `if is_disabled` branch did not exist
 
-Le code **semble** correct a la lecture : `config` est bien defini dans la fonction, juste plus bas. Mais l'ordre d'execution fait que l'utilisation precede l'assignation dans le chemin `is_disabled=True`. Et le `except` generique rend le bug totalement invisible.
+The code **looks** correct on inspection: `config` is indeed defined in the function, just further down. But the execution order means the use precedes the assignment on the `is_disabled=True` path. And the generic `except` makes the bug completely invisible.
 
-Ce qui rend le bug particulierement dangereux : il peut vivre **des mois** sans etre detecte. La branche affectee ne s'execute que dans un cas specifique (ici, `is_disabled=True`), et ce cas est rare en fonctionnement normal. Le jour ou il se produit, la fonctionnalite critique est morte silencieusement.
+What makes this bug particularly dangerous: it can live **for months** undetected. The affected branch only executes in a specific case (here, `is_disabled=True`), and that case is rare under normal operation. When it does occur, the critical feature is silently dead.
 
 ## 4. Detection
 
-### 4.1 Detection manuelle (audit code)
+### 4.1 Manual code audit
 
-Chercher les blocs `except` dangereux :
+Search for dangerous `except` blocks:
 
 ```bash
-# Bare except (catch tout, y compris SystemExit et KeyboardInterrupt)
+# Bare except (catches everything, including SystemExit and KeyboardInterrupt)
 grep -rn "except:" --include="*.py" | grep -v "except:\s*#"
 
-# except Exception avec pass (avale silencieusement)
+# except Exception with pass (silently swallowed)
 grep -B1 -A1 "except Exception" --include="*.py" -rn | grep -A1 "pass"
 
-# except Exception sans logging
+# except Exception without any logging
 grep -A3 "except Exception" --include="*.py" -rn | grep -v "log\|print\|raise\|warning\|error"
 ```
 
-Pour chaque `except Exception: pass` trouve, verifier si les variables dans le `try` sont toutes definies avant utilisation dans tous les chemins conditionnels.
+For every `except Exception: pass` found, verify that all variables used inside the `try` are assigned before use across every conditional path.
 
-### 4.2 Detection automatisee (CI/CD)
+### 4.2 Automated CI/CD
 
-Configurer les linters pour intercepter les deux composantes du bug :
+Configure linters to catch both components of the bug:
 
 ```toml
 # pyproject.toml — ruff
@@ -93,25 +93,25 @@ select = [
     "TRY",   # tryceratops
 ]
 
-# Regles specifiques:
-# F821: undefined name — detecte les variables pas encore definies
-# BLE001: blind except — interdit les bare except
-# TRY002: raise vanilla Exception — pousse a utiliser des exceptions specifiques
-# TRY003: raise within except — interdit raise Exception(...) dans un except
+# Specific rules:
+# F821: undefined name — catches variables not yet defined
+# BLE001: blind except — forbids bare except
+# TRY002: raise vanilla Exception — encourages specific exception types
+# TRY003: raise within except — forbids raise Exception(...) inside an except
 ```
 
-Ajouter `mypy --strict` qui detecte les variables potentiellement non definies :
+Add `mypy --strict`, which detects potentially undefined variables:
 
 ```bash
-# mypy signale "possibly undefined" quand une variable est assignee
-# dans un if/elif mais utilisee apres sans default
+# mypy reports "possibly undefined" when a variable is assigned
+# inside an if/elif but used afterward without a default
 mypy --strict src/
 # error: Name "config" may be undefined
 ```
 
-### 4.3 Detection runtime (production)
+### 4.3 Runtime production
 
-Wrapper les blocs `except` critiques avec un logger qui capture la stack trace :
+Wrap critical `except` blocks with a logger that captures the full stack trace:
 
 ```python
 import logging
@@ -134,15 +134,15 @@ def safe_except_handler(func):
     return wrapper
 ```
 
-## 5. Correction
+## 5. Fix
 
-### 5.1 Fix immediat
+### 5.1 Immediate fix
 
-Deplacer l'assignation avant l'utilisation :
+Move the assignment before the use:
 
 ```python
 def process_agent(agent_id: str, is_disabled: bool):
-    # FIX: lire la config EN PREMIER
+    # FIX: read config FIRST
     config = read_config(agent_id)
 
     try:
@@ -155,13 +155,13 @@ def process_agent(agent_id: str, is_disabled: bool):
         logging.error(f"Error processing {agent_id}: {e}")
 ```
 
-### 5.2 Fix robuste
+### 5.2 Robust fix
 
-Initialiser toutes les variables en debut de scope ET remplacer le bare except par des exceptions specifiques :
+Initialize all variables at the top of the scope AND replace the bare except with specific exception types:
 
 ```python
 def process_agent(agent_id: str, is_disabled: bool):
-    config = None  # Initialisation explicite
+    config = None  # Explicit initialization
 
     try:
         config = read_config(agent_id)
@@ -169,8 +169,8 @@ def process_agent(agent_id: str, is_disabled: bool):
         logging.error(f"Cannot read config for {agent_id}: {e}")
         return
 
-    # Le code qui depend de config est HORS du try
-    # Si config est None ici, c'est explicite et verifiable
+    # Code that depends on config is OUTSIDE the try block
+    # If config is None here, it is explicit and verifiable
     if config is None:
         logging.error(f"No config available for {agent_id}")
         return
@@ -185,51 +185,51 @@ def process_agent(agent_id: str, is_disabled: bool):
         logging.error(f"Processing failed for {agent_id}: {e}")
 ```
 
-## 6. Prevention architecturale
+## 6. Architectural Prevention
 
-La prevention repose sur trois regles strictes :
+Prevention rests on three strict rules:
 
-**1. Interdire `except Exception: pass` au niveau du projet.** Configurer ruff/pylint pour bloquer les bare except et les except trop larges sans logging. Un pre-commit hook empeche de committer du code qui avale les exceptions silencieusement.
+**1. Ban `except Exception: pass` at the project level.** Configure ruff/pylint to block bare excepts and overly broad excepts without logging. A pre-commit hook prevents committing code that silently swallows exceptions.
 
-**2. Initialiser les variables en debut de scope.** Toute variable utilisee dans un bloc try doit etre initialisee avant le try : `config = None`, `result = []`, `handlers = []`. Cela elimine la classe entiere des bugs "undefined variable in conditional path".
+**2. Initialize variables at the top of their scope.** Every variable used inside a `try` block must be initialized before the `try`: `config = None`, `result = []`, `handlers = []`. This eliminates the entire class of "undefined variable in conditional path" bugs.
 
-**3. Separer les blocs try par responsabilite.** Au lieu d'un seul gros `try` qui englobe tout, utiliser des blocs specifiques pour chaque operation risquee. Chaque bloc catch uniquement les exceptions attendues pour cette operation.
+**3. Separate `try` blocks by responsibility.** Instead of one large `try` wrapping everything, use specific blocks for each risky operation. Each block catches only the exceptions expected for that operation.
 
-## 7. Anti-patterns a eviter
+## 7. Anti-patterns to Avoid
 
-1. **`except Exception: pass`** — Le silenceur de bugs par excellence. Il ne gere pas les erreurs, il les cache. Au minimum : `except Exception: logging.exception("...")`.
+1. **`except Exception: pass`** — The premier bug silencer. It does not handle errors; it hides them. At minimum: `except Exception: logging.exception("...")`.
 
-2. **Un seul `try` qui englobe 50 lignes.** Plus le bloc est grand, plus il y a de chances qu'une exception inattendue soit avalee. Decouper en petits blocs specifiques.
+2. **A single `try` spanning 50 lines.** The larger the block, the greater the chance that an unexpected exception is swallowed. Break it into small, specific blocks.
 
-3. **Catch `Exception` au lieu de l'exception specifique.** `except FileNotFoundError` est precis. `except Exception` catch aussi `NameError`, `TypeError`, `AttributeError` — des bugs, pas des erreurs attendues.
+3. **Catching `Exception` instead of the specific exception type.** `except FileNotFoundError` is precise. `except Exception` also catches `NameError`, `TypeError`, `AttributeError` — those are bugs, not expected errors.
 
-4. **Variable assignee dans un `if` sans `else`.** Si `config` n'est assigne que dans `if condition:`, il est indefini quand `condition` est faux. Toujours initialiser avant le `if` ou ajouter un `else`.
+4. **Variable assigned inside an `if` without an `else`.** If `config` is only assigned in `if condition:`, it is undefined when `condition` is false. Always initialize before the `if`, or add an `else`.
 
-5. **Tester la fonctionnalite seulement dans le happy path.** Si le mecanisme d'urgence n'est teste que "quand il n'y a pas d'urgence", le bug dans le chemin d'urgence reste invisible.
+5. **Testing the feature only on the happy path.** If the emergency mechanism is only tested "when there is no emergency", the bug on the emergency path stays invisible.
 
-## 8. Cas limites et variantes
+## 8. Edge Cases and Variants
 
-**Variante 1 : AttributeError silencieux.** `self.module.process()` quand `self.module` est `None` → `AttributeError` avale par `except Exception`. Le module n'a jamais ete initialise mais le code fait comme s'il existait.
+**Variant 1: Silent AttributeError.** `self.module.process()` when `self.module` is `None` → `AttributeError` swallowed by `except Exception`. The module was never initialized but the code behaves as if it were.
 
-**Variante 2 : TypeError dans un generateur.** Un generateur qui yield des valeurs est appele avec le mauvais type d'argument. Le `TypeError` est catch par l'appelant, le generateur ne produit rien, et le pipeline continue avec une liste vide.
+**Variant 2: TypeError inside a generator.** A generator that yields values is called with the wrong argument type. The `TypeError` is caught by the caller, the generator produces nothing, and the pipeline continues with an empty list.
 
-**Variante 3 : ImportError masque.** `from optional_module import feature` dans un try/except. Le module n'est pas installe, le `ImportError` est catch, et `feature` n'est jamais defini. Toutes les references a `feature` plus bas levent `NameError` — catch a nouveau.
+**Variant 3: Masked ImportError.** `from optional_module import feature` inside a try/except. The module is not installed, the `ImportError` is caught, and `feature` is never defined. All subsequent references to `feature` raise `NameError` — caught again.
 
-**Variante 4 : Dead code par ordre de conditions.** Deux `if` testent la meme condition. Le premier catch tout, le second est du dead code. Pas un NameError mais le meme effet : du code qui ne s'execute jamais, invisiblement.
+**Variant 4: Dead code from condition ordering.** Two `if` statements test the same condition. The first catches everything, the second is dead code. Not a NameError, but the same effect: code that never executes, invisibly.
 
-## 9. Checklist d'audit
+## 9. Audit Checklist
 
-- [ ] Aucun `except Exception: pass` ni `except: pass` dans la codebase
-- [ ] Chaque `except` log au minimum le type et le message de l'exception
-- [ ] Toutes les variables utilisees dans un `try` sont initialisees avant le `try`
-- [ ] `ruff` est configure avec les regles BLE001, F821, TRY002
-- [ ] `mypy --strict` ne signale aucun "possibly undefined"
-- [ ] Les chemins d'urgence/erreur sont testes explicitement (pas juste le happy path)
+- [ ] No `except Exception: pass` or `except: pass` anywhere in the codebase
+- [ ] Every `except` block logs at minimum the exception type and message
+- [ ] All variables used inside a `try` block are initialized before the `try`
+- [ ] `ruff` is configured with rules BLE001, F821, TRY002
+- [ ] `mypy --strict` reports no "possibly undefined" warnings
+- [ ] Emergency/error paths are explicitly tested (not just the happy path)
 
-## 10. Pour aller plus loin
+## 10. Further Reading
 
-- Pattern court correspondant : [Pattern 06 — Silent NameError in try/except](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-06)
-- Patterns connexes : #08 (Data Pipeline Freeze — un consommateur qui ne crash pas mais ne recoit plus de donnees a souvent un except silencieux quelque part), #10 (Survival Mode Deadlock — un except silencieux dans le calcul de confiance peut masquer un score toujours a zero)
-- Lectures recommandees :
-  - "The Pragmatic Programmer" (Hunt & Thomas), section sur les exceptions : "Crash early, don't hide errors"
-  - PEP 8 section sur les exceptions — le guide officiel Python recommande de ne jamais utiliser bare except
+- Corresponding short pattern: [Pattern 06 — Silent NameError in try/except](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-06)
+- Related patterns: #08 (Data Pipeline Freeze — a consumer that does not crash but stops receiving data often has a silent except somewhere), #10 (Survival Mode Deadlock — a silent except in confidence scoring can mask a score that is always zero)
+- Recommended reading:
+  - "The Pragmatic Programmer" (Hunt & Thomas), section on exceptions: "Crash early, don't hide errors"
+  - PEP 8 section on exceptions — the official Python guide recommends never using bare except

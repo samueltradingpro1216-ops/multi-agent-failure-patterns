@@ -1,75 +1,75 @@
-# Pattern N°05 — Unit Mismatch 100x
+# Pattern #05 — Unit Mismatch 100x
 
-**Categorie :** Calculs & Etat
-**Severite :** Critical
-**Frameworks impactes :** LangChain / CrewAI / AutoGen / LangGraph / Custom
-**Temps moyen de debogage si non detecte :** 1 a 5 jours (les consequences sont souvent visibles immediatement mais la cause racine est cherchee au mauvais endroit)
+**Category:** Computation & State
+**Severity:** Critical
+**Affected frameworks:** LangChain / CrewAI / AutoGen / LangGraph / Custom
+**Average debugging time if undetected:** 1 to 5 days (consequences are often visible immediately, but the root cause is searched in the wrong place)
 
 ---
 
-## 1. Symptome observable
+## 1. Observable Symptoms
 
-Une action est executee avec une magnitude **10x a 100x superieure** (ou inferieure) a ce qui etait prevu. Un appel API qui devait consommer 40 tokens en consomme 4000. Un budget de $10 est depense en $1000. Un timeout de 30 secondes est interprete comme 30 millisecondes. La formule est correcte, les pourcentages sont corrects, mais la **valeur unitaire** est fausse.
+An action is executed with a magnitude **10x to 100x higher** (or lower) than intended. An API call expected to consume 40 tokens consumes 4,000. A $10 budget is spent as $1,000. A 30-second timeout is interpreted as 30 milliseconds. The formula is correct, the percentages are correct, but the **unit value** is wrong.
 
-Le symptome le plus piege : le systeme ne leve aucune erreur. Le calcul est mathematiquement correct — c'est un input qui est faux. Si `unit_cost = 0.01` alors que ca devrait etre `1.0`, le resultat sera 100x trop petit, mais Python ne sait pas que `0.01` est faux.
+The most insidious symptom: the system raises no error. The calculation is mathematically correct — it is the input that is wrong. If `unit_cost = 0.01` when it should be `1.0`, the result will be 100x too small, but Python has no way of knowing that `0.01` is wrong.
 
-Les consequences varient selon la direction de l'erreur. Si la valeur est trop grande : overconsommation de ressources, budget explose, rate limits atteints. Si la valeur est trop petite : actions negligeables, resultats inutilisables, le systeme semble "ne rien faire".
+The consequences vary depending on the direction of the error. If the value is too large: resource overconsumption, blown budget, rate limits hit. If the value is too small: negligible actions, unusable results, the system appears to "do nothing".
 
-## 2. Histoire vecue (anonymisee)
+## 2. Field Story (anonymized)
 
-Un systeme multi-agents gerait des budgets de tokens LLM pour plusieurs modeles. Le module de calcul principal utilisait `cost_per_token = 0.001` (correct pour le modele A). Le module de monitoring, developpe separement, utilisait `cost_per_token = 0.00001` (copie-colle depuis la documentation d'un modele beaucoup moins cher).
+A multi-agent system managed LLM token budgets across several models. The main computation module used `cost_per_token = 0.001` (correct for model A). The monitoring module, developed separately, used `cost_per_token = 0.00001` (copy-pasted from the documentation of a much cheaper model).
 
-Le resultat : le monitoring affichait des couts 100x inferieurs a la realite. L'equipe pensait depenser $50/jour alors que la facture reelle etait de $5000/jour. Le bug a ete decouvert a la reception de la premiere facture mensuelle — un choc de $150,000 au lieu des $1,500 estimes.
+The result: monitoring displayed costs 100x lower than reality. The team believed they were spending $50/day while the actual bill was $5,000/day. The bug was discovered upon receiving the first monthly invoice — a $150,000 shock instead of the estimated $1,500.
 
-La cause : un copier-coller d'une valeur unitaire d'un modele a un autre, sans verification. Le code etait identique entre les deux modules, seule la constante differait.
+The cause: a copy-paste of a unit value from one model to another, without verification. The code was identical between the two modules; only the constant differed.
 
-## 3. Cause racine technique
+## 3. Technical Root Cause
 
-Le bug se produit quand **deux modules du meme systeme utilisent des valeurs unitaires differentes** pour la meme entite. Chaque module hardcode sa propre constante, copiee depuis une documentation ou un autre module, sans source centralisee :
+The bug occurs when **two modules of the same system use different unit values** for the same entity. Each module hardcodes its own constant, copied from documentation or another module, with no centralized source:
 
 ```python
-# Module A — calcul de budget (correct)
+# Module A — budget calculation (correct)
 COST_PER_TOKEN = 0.001  # $0.001 per token for Model X
 
-# Module B — monitoring (BUG — copie depuis Model Y, 100x moins cher)
+# Module B — monitoring (BUG — copied from Model Y, 100x cheaper)
 COST_PER_TOKEN = 0.00001  # Wrong! Copied from cheaper model docs
 
-# La formule est identique, seule la constante differe :
+# The formula is identical, only the constant differs:
 total_cost = tokens_used * COST_PER_TOKEN
 # Module A: 4000 * 0.001 = $4.00 (correct)
-# Module B: 4000 * 0.00001 = $0.04 (100x trop bas)
+# Module B: 4000 * 0.00001 = $0.04 (100x too low)
 ```
 
-Le probleme fondamental est l'**absence de source unique** pour les valeurs unitaires. Chaque module a sa propre copie de la constante, et rien ne garantit qu'elles sont identiques. Le copier-coller est le vecteur d'infection : la constante est correcte dans le module original, incorrecte dans la copie.
+The fundamental problem is the **absence of a single source of truth** for unit values. Each module has its own copy of the constant, and nothing guarantees they are identical. Copy-paste is the infection vector: the constant is correct in the original module, incorrect in the copy.
 
-Les variantes incluent :
-- Melanger dollars et centimes (`amount = 500` : est-ce 500$ ou 500 cents ?)
-- Melanger secondes et millisecondes (`timeout = 30` : 30s ou 30ms ?)
-- Melanger tokens et kiloTokens (`budget = 4` : 4 tokens ou 4000 ?)
-- Utiliser des valeurs de test en production (`unit_cost = 0.0` ou `unit_cost = 1.0` au lieu de la vraie valeur)
+Variants include:
+- Mixing dollars and cents (`amount = 500`: is this $500 or 500 cents?)
+- Mixing seconds and milliseconds (`timeout = 30`: 30s or 30ms?)
+- Mixing tokens and kiloTokens (`budget = 4`: 4 tokens or 4,000?)
+- Using test values in production (`unit_cost = 0.0` or `unit_cost = 1.0` instead of the real value)
 
 ## 4. Detection
 
-### 4.1 Detection manuelle (audit code)
+### 4.1 Manual code audit
 
-Lister toutes les constantes unitaires et les comparer entre modules :
+List all unit constants and compare them across modules:
 
 ```bash
-# Chercher les definitions de constantes unitaires
+# Search for unit constant definitions
 grep -rn "COST_PER\|PRICE_PER\|UNIT_\|_PER_TOKEN\|_PER_UNIT" --include="*.py"
 
-# Chercher les valeurs hardcodees dans les calculs
+# Search for hardcoded values in calculations
 grep -rn "\* 0\.0\|\* 1\.0\|/ 0\.0\|/ 1\.0" --include="*.py"
 
-# Chercher les copier-colles suspects (meme variable dans plusieurs fichiers)
+# Search for suspicious copy-pastes (same variable in multiple files)
 for var in COST_PER_TOKEN UNIT_PRICE POINT_VALUE; do
     echo "=== $var ===" && grep -rn "$var" --include="*.py"
 done
 ```
 
-### 4.2 Detection automatisee (CI/CD)
+### 4.2 Automated CI/CD
 
-Centraliser les valeurs unitaires et tester au demarrage que tous les modules utilisent la meme source :
+Centralize unit values and test at startup that all modules use the same source:
 
 ```python
 # test_unit_consistency.py
@@ -98,9 +98,9 @@ def test_no_hardcoded_units():
     assert not violations, f"Hardcoded unit values found:\n" + "\n".join(violations)
 ```
 
-### 4.3 Detection runtime (production)
+### 4.3 Runtime production
 
-Garde-fou sur chaque action : verifier que la magnitude est dans une plage attendue avant d'executer :
+Guard on every action: verify that the magnitude is within an expected range before executing:
 
 ```python
 class MagnitudeGuard:
@@ -129,33 +129,33 @@ guard = MagnitudeGuard({
 guard.check("api_cost_usd", 5000.0)  # Raises: probable unit mismatch
 ```
 
-## 5. Correction
+## 5. Fix
 
-### 5.1 Fix immediat
+### 5.1 Immediate fix
 
-Identifier la bonne valeur unitaire et la corriger dans le module fautif :
+Identify the correct unit value and fix it in the offending module:
 
 ```python
-# AVANT (bug: copie depuis un autre modele)
+# BEFORE (bug: copied from another model)
 COST_PER_TOKEN = 0.00001
 
-# APRES (correct: valeur du bon modele)
+# AFTER (correct: value from the right model)
 COST_PER_TOKEN = 0.001
 ```
 
-Puis ajouter un garde-fou qui bloque les valeurs aberrantes :
+Then add a guard that blocks out-of-range values:
 
 ```python
 def compute_cost(tokens: int, cost_per_token: float) -> float:
     cost = tokens * cost_per_token
-    if cost > 1000:  # Hard cap: aucune action ne devrait couter > $1000
+    if cost > 1000:  # Hard cap: no action should cost more than $1,000
         raise ValueError(f"Cost too high: ${cost:.2f} for {tokens} tokens. Check unit value.")
     return cost
 ```
 
-### 5.2 Fix robuste
+### 5.2 Robust fix
 
-Centraliser toutes les valeurs unitaires dans un registre unique :
+Centralize all unit values in a single registry:
 
 ```python
 """unit_registry.py — Single source of truth for all unit values."""
@@ -179,50 +179,50 @@ def get_unit(model: str, unit: str) -> float:
 cost = tokens * get_unit("gpt-4", "cost_per_token")
 ```
 
-## 6. Prevention architecturale
+## 6. Architectural Prevention
 
-La prevention repose sur deux principes : **centralisation** et **garde-fous**.
+Prevention rests on two principles: **centralization** and **guards**.
 
-**Centralisation** : toutes les valeurs unitaires vivent dans un seul fichier/module (`unit_registry.py` ou `config.yaml`). Aucun autre module n'a le droit de definir ses propres constantes unitaires. Un test CI verifie qu'aucun module ne hardcode une valeur qui devrait venir du registre.
+**Centralization**: all unit values live in a single file/module (`unit_registry.py` or `config.yaml`). No other module is permitted to define its own unit constants. A CI test verifies that no module hardcodes a value that should come from the registry.
 
-**Garde-fous** : avant chaque action dont la magnitude depend d'une valeur unitaire, un `MagnitudeGuard` verifie que le resultat est dans une plage attendue. Si un calcul produit un budget de tokens de 4 millions ou un cout de $50,000, c'est presque certainement un bug unitaire — le guard le bloque et alerte.
+**Guards**: before every action whose magnitude depends on a unit value, a `MagnitudeGuard` verifies that the result is within an expected range. If a calculation produces a token budget of 4 million or a cost of $50,000, this is almost certainly a unit bug — the guard blocks it and raises an alert.
 
-En complement, les valeurs unitaires du registre doivent etre validees au demarrage du systeme par un health check qui compare avec une source externe (API du provider, documentation officielle).
+In addition, the unit values in the registry should be validated at system startup by a health check that compares them against an external source (provider API, official documentation).
 
-## 7. Anti-patterns a eviter
+## 7. Anti-patterns to Avoid
 
-1. **Copier-coller les valeurs unitaires entre modules.** C'est le vecteur d'infection principal. Toujours importer depuis le registre.
+1. **Copy-pasting unit values between modules.** This is the primary infection vector. Always import from the registry.
 
-2. **Pas de guard sur les valeurs calculees.** Un `total = budget / unit_value` sans verification de borne est une bombe a retardement. Si `unit_value` est 100x trop petit, `total` est 100x trop grand.
+2. **No guard on computed values.** A `total = budget / unit_value` without a bounds check is a time bomb. If `unit_value` is 100x too small, `total` is 100x too large.
 
-3. **Melanger les unites dans le meme pipeline.** Un module qui passe un montant en centimes a un module qui attend des dollars cree un mismatch silencieux.
+3. **Mixing units within the same pipeline.** A module passing an amount in cents to a module expecting dollars creates a silent mismatch.
 
-4. **Utiliser des valeurs de test en production.** `unit_cost = 0.0` pour "gratuit en dev" qui reste en prod = actions sans cout apparent = aucune alerte sur la surconsommation.
+4. **Using test values in production.** `unit_cost = 0.0` for "free in dev" that remains in prod = actions with no apparent cost = no alert on overconsumption.
 
-5. **Pas d'audit croise au demarrage.** Le systeme devrait verifier au boot que tous les modules ont les memes valeurs unitaires pour les memes entites.
+5. **No cross-audit at startup.** The system should verify at boot that all modules share the same unit values for the same entities.
 
-## 8. Cas limites et variantes
+## 8. Edge Cases and Variants
 
-**Variante 1 : Changement de pricing.** Le provider LLM change ses prix. Le registre est mis a jour mais un module secondaire a sa propre copie hardcodee qui reste a l'ancien prix. Le monitoring affiche des couts incorrects pendant des semaines.
+**Variant 1: Pricing change.** The LLM provider changes its prices. The registry is updated, but a secondary module has its own hardcoded copy that remains at the old price. Monitoring displays incorrect costs for weeks.
 
-**Variante 2 : Unites differentes par region.** Le meme service coute $0.01/appel en US et EUR0.01/appel en EU. Si le systeme ne convertit pas les devises, les couts sont compares sans conversion — 1 USD != 1 EUR.
+**Variant 2: Different units by region.** The same service costs $0.01/call in the US and EUR0.01/call in the EU. If the system does not convert currencies, costs are compared without conversion — 1 USD != 1 EUR.
 
-**Variante 3 : Precision flottante.** `0.1 + 0.2 = 0.30000000000000004` en Python. Sur des millions d'operations, la derive de precision peut accumuler des erreurs significatives. Utiliser `decimal.Decimal` pour les calculs financiers.
+**Variant 3: Floating-point precision.** `0.1 + 0.2 = 0.30000000000000004` in Python. Over millions of operations, precision drift can accumulate significant errors. Use `decimal.Decimal` for financial calculations.
 
-**Variante 4 : Valeurs unitaires nulles.** `unit_cost = 0.0` (free tier) dans un calcul `budget / unit_cost` → `ZeroDivisionError`. Le guard doit aussi verifier les valeurs nulles.
+**Variant 4: Zero unit values.** `unit_cost = 0.0` (free tier) in a `budget / unit_cost` calculation → `ZeroDivisionError`. The guard must also check for zero values.
 
-## 9. Checklist d'audit
+## 9. Audit Checklist
 
-- [ ] Toutes les valeurs unitaires sont centralisees dans un registre unique
-- [ ] Aucun module ne hardcode de valeur unitaire (verifie par test CI)
-- [ ] Un garde-fou verifie la magnitude avant chaque action critique
-- [ ] Le registre est valide au demarrage contre une source de reference
-- [ ] Les unites sont documentees explicitement (dollars vs centimes, secondes vs millisecondes)
+- [ ] All unit values are centralized in a single registry
+- [ ] No module hardcodes a unit value (verified by CI test)
+- [ ] A guard verifies magnitude before every critical action
+- [ ] The registry is validated at startup against a reference source
+- [ ] Units are explicitly documented (dollars vs. cents, seconds vs. milliseconds)
 
-## 10. Pour aller plus loin
+## 10. Further Reading
 
-- Pattern court correspondant : [Pattern 05 — Unit Mismatch 100x](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-05)
-- Patterns connexes : #03 (Cascade de Penalites — un mismatch unitaire peut amplifier une cascade), #04 (Multi-File State Desync — la valeur unitaire peut etre stockee a plusieurs endroits avec des valeurs differentes)
-- Lectures recommandees :
-  - "Mars Climate Orbiter" (NASA, 1999) — l'exemple historique le plus celebre de mismatch unitaire (imperial vs metrique), ayant cause la perte d'un satellite de $125 millions
-  - Documentation OpenAI/Anthropic sur le pricing par token — les unites changent entre modeles et entre input/output
+- Corresponding short pattern: [Pattern 05 — Unit Mismatch 100x](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-05)
+- Related patterns: #03 (Penalty Cascade — a unit mismatch can amplify a cascade), #04 (Multi-File State Desync — the unit value can be stored in multiple places with different values)
+- Recommended reading:
+  - "Mars Climate Orbiter" (NASA, 1999) — the most famous historical example of a unit mismatch (imperial vs. metric), which caused the loss of a $125 million satellite
+  - OpenAI/Anthropic documentation on per-token pricing — units vary between models and between input/output

@@ -1,39 +1,39 @@
-# Pattern N°11 — Race Condition on Shared File
+# Pattern #11 — Race Condition on Shared File
 
-**Categorie :** Gouvernance Multi-Agents
-**Severite :** High
-**Frameworks impactes :** LangChain / CrewAI / AutoGen / LangGraph / Custom
-**Temps moyen de debogage si non detecte :** 3 a 20 jours (le bug est intermittent — il ne se produit que quand deux agents ecrivent "au meme moment", ce qui peut etre rare)
+**Category:** Multi-Agent Governance
+**Severity:** High
+**Affected frameworks:** LangChain / CrewAI / AutoGen / LangGraph / Custom
+**Average debugging time if undetected:** 3 to 20 days (the bug is intermittent — it only occurs when two agents write "at the same moment", which can be rare)
 
 ---
 
-## 1. Symptome observable
+## 1. Observable Symptoms
 
-Des donnees **disparaissent** du fichier de config ou du state store. Un compteur qui devrait valoir 10 vaut 7. Un JSON contient des donnees corrompues ou tronquees. Les logs d'un agent montrent qu'il a ecrit une valeur, mais le fichier contient une autre valeur — celle ecrite par un autre agent quelques millisecondes plus tard.
+Data **disappears** from the config file or the state store. A counter that should read 10 reads 7. A JSON file contains corrupted or truncated data. One agent's logs show it wrote a value, but the file contains a different value — the one written by another agent a few milliseconds later.
 
-Le symptome le plus deroutant : le bug est **intermittent**. Il ne se produit que quand deux agents ecrivent au meme moment, ce qui depend du timing exact de l'ordonnancement. Le systeme peut tourner des heures sans probleme, puis perdre 3 updates en 5 minutes. Les tests en local (mono-thread) ne reproduisent jamais le bug. Il n'apparait qu'en production avec de la concurrence reelle.
+The most confusing symptom: the bug is **intermittent**. It only occurs when two agents write simultaneously, which depends on the exact scheduling timing. The system can run for hours without issue, then lose 3 updates in 5 minutes. Local tests (single-threaded) never reproduce the bug. It only appears in production under real concurrency.
 
-Un autre symptome courant dans les systemes multi-agents : les **quotas ou compteurs de budget** sont faux. Deux agents consomment des tokens LLM en parallele, chacun incremente le compteur d'usage, mais un des deux increments est perdu. Le compteur dit "850/1000 tokens utilises" alors que la realite est "920/1000". Le budget explose sans alerte.
+Another common symptom in multi-agent systems: **quota or budget counters are wrong**. Two agents consume LLM tokens in parallel, each increments the usage counter, but one of the increments is lost. The counter reads "850/1000 tokens used" when the reality is "920/1000". The budget overruns without any alert.
 
-## 2. Histoire vecue (anonymisee)
+## 2. Field Story (anonymized)
 
-Un systeme multi-agents avait un fichier `usage.json` qui trackait l'utilisation des APIs LLM. Chaque agent lisait le fichier, incrementait son compteur, et reecrivait le fichier. Quatre agents tournaient en parallele.
+A multi-agent system had a `usage.json` file that tracked LLM API usage. Each agent read the file, incremented its counter, and rewrote the file. Four agents were running in parallel.
 
-L'equipe a remarque que la facture LLM etait systematiquement 20-30% plus elevee que ce que le tracker affichait. En auditant les logs, ils ont decouvert le probleme :
+The team noticed that the LLM invoice was consistently 20–30% higher than what the tracker displayed. Auditing the logs revealed the problem:
 
 ```
-Agent A: lit usage.json → {"total": 500}
-Agent B: lit usage.json → {"total": 500}    (meme valeur, A n'a pas encore ecrit)
-Agent A: ecrit usage.json → {"total": 510}  (500 + 10)
-Agent B: ecrit usage.json → {"total": 505}  (500 + 5, ecrase le 510 de A)
-→ 10 tokens de A sont perdus dans le compteur
+Agent A: reads usage.json → {"total": 500}
+Agent B: reads usage.json → {"total": 500}    (same value, A has not written yet)
+Agent A: writes usage.json → {"total": 510}  (500 + 10)
+Agent B: writes usage.json → {"total": 505}  (500 + 5, overwrites A's 510)
+→ 10 tokens from A are lost in the counter
 ```
 
-Sur une journee avec des milliers d'operations, les pertes accumulees representaient 30% du total. Le tracker disait "7000 tokens utilises" alors que la facture reelle etait de 10,000.
+Over a day with thousands of operations, the accumulated losses represented 30% of the total. The tracker read "7000 tokens used" while the actual invoice was 10,000.
 
-## 3. Cause racine technique
+## 3. Technical Root Cause
 
-Le bug est une **race condition classique** sur un read-modify-write non atomique. Deux agents (ou plus) executent la sequence suivante en parallele, sans mecanisme d'exclusion mutuelle :
+The bug is a **classic race condition** on a non-atomic read-modify-write. Two or more agents execute the following sequence in parallel, without any mutual exclusion mechanism:
 
 ```
 1. Read:   data = json.load(open("state.json"))
@@ -41,30 +41,30 @@ Le bug est une **race condition classique** sur un read-modify-write non atomiqu
 3. Write:  json.dump(data, open("state.json", "w"))
 ```
 
-Si deux agents executent cette sequence en parallele, l'agent B peut lire la valeur **avant** que l'agent A n'ait ecrit sa modification. L'agent B calcule sa modification a partir de l'ancienne valeur et ecrase la modification de l'agent A.
+If two agents execute this sequence in parallel, agent B may read the value **before** agent A has written its modification. Agent B then computes its modification from the stale value and overwrites agent A's modification.
 
-Le probleme est aggrave dans les systemes multi-agents par trois facteurs :
+The problem is compounded in multi-agent systems by three factors:
 
-**1. Agents en parallele.** Contrairement a un serveur web mono-processus, un systeme multi-agents a souvent N agents qui tournent en parallele (threads, processus, ou cron jobs independants). Chacun peut acceder au fichier partage a tout moment.
+**1. Agents in parallel.** Unlike a single-process web server, a multi-agent system often has N agents running in parallel (threads, processes, or independent cron jobs). Each can access the shared file at any time.
 
-**2. Duree du "modify".** Dans un systeme multi-agents, l'etape "modify" peut inclure un appel LLM (3-30 secondes). Pendant ce temps, le fichier est "lu mais pas encore reecrit" — une fenetre de vulnerabilite tres large comparee a un simple `count += 1`.
+**2. Duration of the "modify" step.** In a multi-agent system, the "modify" step may include an LLM call (3–30 seconds). During that time, the file is "read but not yet rewritten" — a very wide vulnerability window compared to a simple `count += 1`.
 
-**3. Fichiers JSON = pas de transactions.** Contrairement a une base de donnees, un fichier JSON ne supporte pas les ecritures atomiques ni les transactions. L'ecriture d'un fichier JSON n'est pas atomique : si le processus crashe au milieu, le fichier peut etre corrompu (tronque, JSON invalide).
+**3. JSON files = no transactions.** Unlike a database, a JSON file does not support atomic writes or transactions. Writing a JSON file is not atomic: if the process crashes mid-write, the file can be corrupted (truncated, invalid JSON).
 
 ## 4. Detection
 
-### 4.1 Detection manuelle (audit code)
+### 4.1 Manual code audit
 
-Chercher les patterns read-modify-write sur des fichiers partages :
+Search for read-modify-write patterns on shared files:
 
 ```bash
-# Chercher les lectures de fichiers JSON
+# Search for JSON file reads
 grep -rn "json\.load\|json\.loads.*read\|open.*json.*r" --include="*.py"
 
-# Chercher les ecritures correspondantes
+# Search for corresponding writes
 grep -rn "json\.dump\|open.*json.*w" --include="*.py"
 
-# Chercher les fichiers accedes par plusieurs modules
+# Search for files accessed by multiple modules
 for f in $(grep -roh "['\"].*\.json['\"]" --include="*.py" | sort -u); do
     count=$(grep -rl "$f" --include="*.py" | wc -l)
     if [ "$count" -gt 1 ]; then
@@ -73,9 +73,9 @@ for f in $(grep -roh "['\"].*\.json['\"]" --include="*.py" | sort -u); do
 done
 ```
 
-### 4.2 Detection automatisee (CI/CD)
+### 4.2 Automated CI/CD
 
-Test de concurrence qui verifie la coherence apres des ecritures paralleles :
+Concurrency test that verifies consistency after parallel writes:
 
 ```python
 import threading
@@ -119,9 +119,9 @@ def test_concurrent_write_consistency():
     assert actual == expected_total, f"Lost {expected_total - actual} updates"
 ```
 
-### 4.3 Detection runtime (production)
+### 4.3 Runtime production
 
-Compteur de verification qui compare les increments attendus aux increments reels :
+Verification counter that compares expected increments to actual increments:
 
 ```python
 import threading
@@ -153,11 +153,11 @@ class WriteAuditor:
         return {"race_condition": False}
 ```
 
-## 5. Correction
+## 5. Fix
 
-### 5.1 Fix immediat
+### 5.1 Immediate fix
 
-Ajouter un lock autour de chaque read-modify-write :
+Add a lock around each read-modify-write:
 
 ```python
 import threading
@@ -175,7 +175,7 @@ def safe_increment(filepath: str, key: str, amount: int = 1):
             json.dump(data, f, indent=2)
 ```
 
-Pour les processus multiples (pas juste des threads), utiliser un file lock :
+For multiple processes (not just threads), use a file lock:
 
 ```python
 import fcntl  # Unix only; use msvcrt or portalocker on Windows
@@ -194,9 +194,9 @@ def safe_increment_multiprocess(filepath: str, key: str, amount: int = 1):
             fcntl.flock(f, fcntl.LOCK_UN)  # Release lock
 ```
 
-### 5.2 Fix robuste
+### 5.2 Robust fix
 
-Migrer vers SQLite avec transactions (elimine la classe entiere de race conditions sur les fichiers) :
+Migrate to SQLite with transactions (eliminates the entire class of file-based race conditions):
 
 ```python
 import sqlite3
@@ -254,15 +254,15 @@ class AtomicStateStore:
             return int(row[0]) if row else default
 ```
 
-## 6. Prevention architecturale
+## 6. Architectural Prevention
 
-La prevention repose sur un changement de paradigme : **ne jamais utiliser des fichiers JSON comme state store concurrent**.
+Prevention rests on a paradigm shift: **never use JSON files as a concurrent state store**.
 
-**1. SQLite pour l'etat local.** SQLite supporte les transactions, les locks, et les ecritures concurrentes (avec WAL mode). C'est un remplacement drop-in pour les fichiers JSON avec des garanties de coherence.
+**1. SQLite for local state.** SQLite supports transactions, locks, and concurrent writes (with WAL mode). It is a drop-in replacement for JSON files with consistency guarantees.
 
-**2. Un seul writer par ressource.** Au lieu de 4 agents qui ecrivent dans le meme fichier, un seul "agent writer" centralise les ecritures. Les autres agents lui envoient des messages ("incremente de 5"). Le writer serialise les ecritures.
+**2. A single writer per resource.** Instead of 4 agents writing to the same file, a single "writer agent" centralizes writes. Other agents send it messages ("increment by 5"). The writer serializes the writes.
 
-**3. Ecriture atomique pour les fichiers.** Si un fichier JSON est necessaire (compatibilite), utiliser le pattern "write-to-temp + rename" :
+**3. Atomic writes for files.** If a JSON file is required (e.g., for compatibility), use the "write-to-temp + rename" pattern:
 
 ```python
 import tempfile, os, json
@@ -280,40 +280,40 @@ def atomic_write_json(filepath: str, data: dict):
         raise
 ```
 
-## 7. Anti-patterns a eviter
+## 7. Anti-patterns to Avoid
 
-1. **json.load() + json.dump() sans lock.** C'est la recette de la race condition. Toujours wrapper dans un lock ou utiliser SQLite.
+1. **json.load() + json.dump() without a lock.** This is the recipe for a race condition. Always wrap in a lock or use SQLite.
 
-2. **Fichier JSON comme compteur concurrent.** Un fichier JSON n'est pas une base de donnees. Il ne supporte pas les ecritures atomiques ni les transactions.
+2. **JSON file as a concurrent counter.** A JSON file is not a database. It does not support atomic writes or transactions.
 
-3. **Lock en memoire pour des processus multiples.** `threading.Lock()` ne protege que les threads du meme processus. Si les agents sont des processus separes ou des cron jobs, il faut un file lock ou une DB.
+3. **In-memory lock for multiple processes.** `threading.Lock()` only protects threads within the same process. If agents are separate processes or cron jobs, a file lock or a database is required.
 
-4. **Pas de test de concurrence.** Si le code n'est teste qu'en mono-thread, la race condition est invisible. Toujours tester avec N threads/processus en parallele.
+4. **No concurrency test.** If the code is only tested single-threaded, the race condition is invisible. Always test with N threads/processes in parallel.
 
-5. **Ignorer les ecritures tronquees.** Si le processus crashe pendant un `json.dump()`, le fichier peut etre tronque (JSON invalide). Le prochain `json.load()` crash. Solution : ecriture atomique via temp file + rename.
+5. **Ignoring truncated writes.** If the process crashes during a `json.dump()`, the file may be truncated (invalid JSON). The next `json.load()` will crash. Solution: atomic write via temp file + rename.
 
-## 8. Cas limites et variantes
+## 8. Edge Cases and Variants
 
-**Variante 1 : Race condition sur SQLite.** Meme SQLite a des limites : en mode journal (pas WAL), les ecritures concurrentes sont serialisees et peuvent causer des timeouts. Utiliser `PRAGMA journal_mode=WAL` et un timeout suffisant.
+**Variant 1: Race condition on SQLite.** Even SQLite has limits: in journal mode (not WAL), concurrent writes are serialized and can cause timeouts. Use `PRAGMA journal_mode=WAL` and a sufficient timeout.
 
-**Variante 2 : Race condition sur un cache en memoire.** Deux threads accedent au meme dictionnaire Python sans lock. Python a le GIL qui protege certaines operations atomiques, mais pas `dict[key] = compute(dict[key])` qui est un read-modify-write.
+**Variant 2: Race condition on an in-memory cache.** Two threads access the same Python dictionary without a lock. Python's GIL protects some atomic operations, but not `dict[key] = compute(dict[key])`, which is a read-modify-write.
 
-**Variante 3 : Lock file stale.** Un processus acquiert un lock fichier, crashe sans le liberer. Le lock reste indefiniment. Solution : lock avec TTL (si le lock a > N minutes, le considerer comme stale et le supprimer).
+**Variant 3: Stale lock file.** A process acquires a file lock, then crashes without releasing it. The lock persists indefinitely. Solution: lock with a TTL (if the lock is older than N minutes, consider it stale and delete it).
 
-**Variante 4 : ABA problem.** L'agent A lit `count=5`, est preempte. L'agent B incremente a 6 puis decremente a 5. L'agent A reprend, voit `count=5` (inchange), et ecrit `count=6`. Le resultat est correct par accident mais la logique est fausse — l'agent A n'a pas vu les deux operations de B.
+**Variant 4: ABA problem.** Agent A reads `count=5` and is preempted. Agent B increments to 6 then decrements back to 5. Agent A resumes, sees `count=5` (unchanged), and writes `count=6`. The result is accidentally correct but the logic is wrong — agent A never observed B's two operations.
 
-## 9. Checklist d'audit
+## 9. Audit Checklist
 
-- [ ] Aucun fichier JSON n'est utilise comme state store concurrent sans lock
-- [ ] Chaque read-modify-write est protege par un lock (threading.Lock ou file lock)
-- [ ] Les ecritures de fichiers critiques utilisent le pattern atomic write (temp + rename)
-- [ ] Un test de concurrence (N threads, M increments) verifie la coherence
-- [ ] Les lock files stale sont detectes et nettoyes automatiquement
+- [ ] No JSON file is used as a concurrent state store without a lock
+- [ ] Every read-modify-write is protected by a lock (threading.Lock or file lock)
+- [ ] Writes to critical files use the atomic write pattern (temp + rename)
+- [ ] A concurrency test (N threads, M increments) verifies consistency
+- [ ] Stale lock files are detected and cleaned up automatically
 
-## 10. Pour aller plus loin
+## 10. Further Reading
 
-- Pattern court correspondant : [Pattern 11 — Race Condition on Shared File](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-11)
-- Patterns connexes : #04 (Multi-File State Desync — la race condition peut creer une desync entre copies), #03 (Cascade de Penalites — des read-modify-write concurrents sur le meme parametre)
-- Lectures recommandees :
-  - "Designing Data-Intensive Applications" (Martin Kleppmann), chapitre 7 sur les transactions et la concurrence
-  - Documentation Python `threading` — section sur les locks et les conditions de course
+- Corresponding short pattern: [Pattern 11 — Race Condition on Shared File](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-11)
+- Related patterns: #04 (Multi-File State Desync — a race condition can create a desync between copies), #03 (Penalty Cascade — concurrent read-modify-writes on the same parameter)
+- Recommended reading:
+  - "Designing Data-Intensive Applications" (Martin Kleppmann), chapter 7 on transactions and concurrency
+  - Python `threading` documentation — section on locks and race conditions

@@ -1,95 +1,95 @@
-# Pattern N°01 — Timezone Mismatch
+# Pattern #01 — Timezone Mismatch
 
-**Categorie :** Temps & Synchronisation
-**Severite :** Critical
-**Frameworks impactes :** LangChain / CrewAI / AutoGen / LangGraph / Custom
-**Temps moyen de debogage si non detecte :** 2 a 10 jours (souvent decouvert par accident lors d'un audit, pas par un symptome immediat)
+**Category:** Time & Synchronization
+**Severity:** Critical
+**Affected frameworks:** LangChain / CrewAI / AutoGen / LangGraph / Custom
+**Average debugging time if undetected:** 2 to 10 days (often discovered by accident during an audit, not from an immediate symptom)
 
 ---
 
-## 1. Symptome observable
+## 1. Observable Symptoms
 
-Le systeme agit aux **mauvaises heures**. Un filtre temporel cense activer les agents entre 12h et 18h UTC les active en realite entre 9h et 15h UTC — un decalage de 3 heures que personne ne remarque parce que le systeme semble fonctionner normalement.
+The system acts at the **wrong hours**. A time filter meant to activate agents between 12:00 and 18:00 UTC actually activates them between 09:00 and 15:00 UTC — a 3-hour offset that nobody notices because the system appears to work normally.
 
-Les logs sont trompeurs : le filtre fonctionne, il bloque et autorise des requetes. Mais les heures sont decalees. Le systeme rate sa fenetre d'activite optimale (par exemple le pic de trafic utilisateur, la fenetre de batch processing, ou la plage horaire ou les APIs partenaires sont disponibles) et agit pendant les heures creuses.
+The logs are misleading: the filter works, it blocks and allows requests. But the hours are shifted. The system misses its optimal activity window (e.g., peak user traffic, batch processing window, or the time slot when partner APIs are available) and acts during off-peak hours.
 
-Le symptome le plus perfide : **le bug est invisible en test local** si le poste du developpeur est en UTC. Le decalage n'apparait qu'en production, sur un serveur dont la timezone systeme est differente (UTC+2 sur un VPS en Europe, UTC+8 sur un cloud provider asiatique, ou l'heure du service tiers auquel on se connecte). Les tests passent, le code review passe, et le bug vit en production pendant des semaines avant qu'un audit ne le revele.
+The most insidious symptom: **the bug is invisible in local testing** if the developer's machine is in UTC. The offset only appears in production, on a server whose system timezone is different (UTC+2 on a European VPS, UTC+8 on an Asian cloud provider, or the time of the third-party service being connected to). Tests pass, code review passes, and the bug lives in production for weeks until an audit reveals it.
 
-Un autre symptome courant : les **timestamps entre composants ne correspondent pas**. L'agent A ecrit un log a "14:32:05", l'agent B ecrit un log a "17:32:07" pour le meme evenement. Le delta est proche d'un multiple d'heure (3h), pas d'un drift reseau normal (< 1s). C'est le signal d'un mismatch timezone, pas d'un probleme de latence.
+Another common symptom: **timestamps between components don't match**. Agent A logs an event at "14:32:05", Agent B logs the same event at "17:32:07". The delta is close to a multiple of one hour (3h), not a normal network drift (< 1s). This signals a timezone mismatch, not a latency problem.
 
-## 2. Histoire vecue (anonymisee)
+## 2. Field Story (anonymized)
 
-Un systeme multi-agents en production utilisait un filtre horaire pour limiter l'activite de ses agents a la fenetre 12h-18h UTC — la plage ou les donnees en temps reel etaient les plus fiables et les plus volumineuses. Le filtre fonctionnait depuis 3 semaines sans alerte.
+A multi-agent production system used a time filter to limit agent activity to the 12:00–18:00 UTC window — the period when real-time data was most reliable and most voluminous. The filter had been running for 3 weeks without any alert.
 
-Lors d'un audit de performance, l'equipe a remarque que le systeme etait anormalement actif entre 9h et 15h UTC et silencieux entre 15h et 18h UTC. En investiguant, ils ont decouvert que le composant executeur utilisait `TimeCurrent()` (l'equivalent local de `datetime.now()`) au lieu de `TimeGMT()` pour evaluer le filtre. Le serveur etait en UTC+3 (data center en Europe de l'Est), donc les bornes "12h-18h" etaient evaluees en heure locale (12h-18h serveur = 9h-15h UTC). Le systeme ratait les 3 meilleures heures de la journee et operait pendant les 3 heures les moins fiables.
+During a performance audit, the team noticed the system was abnormally active between 09:00 and 15:00 UTC and silent between 15:00 and 18:00 UTC. Investigating, they discovered the executor component used `TimeCurrent()` (the local equivalent of `datetime.now()`) instead of `TimeGMT()` to evaluate the filter. The server was in UTC+3 (Eastern European data center), so the "12–18" bounds were evaluated in local time (12–18 server time = 09:00–15:00 UTC). The system was missing the 3 best hours of the day and operating during the 3 least reliable ones.
 
-Le bug etait invisible car les agents produisaient des resultats acceptables meme sur la mauvaise fenetre — juste ~15-20% moins bons. Il a fallu un audit ligne par ligne pour le trouver.
+The bug was invisible because agents produced acceptable results even on the wrong window — just ~15–20% worse. It took a line-by-line audit to find it.
 
-## 3. Cause racine technique
+## 3. Technical Root Cause
 
-Le bug naît quand un composant utilise l'**heure locale du serveur** au lieu d'UTC explicite pour ses calculs temporels. Dans un systeme mono-serveur, ca peut fonctionner. Dans un systeme multi-agents, chaque composant peut tourner dans un contexte timezone different :
+The bug arises when a component uses the **server's local time** instead of explicit UTC for its time calculations. In a single-server system, this may work. In a multi-agent system, each component can run in a different timezone context:
 
-- L'orchestrateur Python utilise `datetime.now()` (heure locale du VPS)
-- L'executeur utilise l'heure de son service tiers (API, base de donnees, cloud provider)
-- Les cron jobs utilisent leur propre timezone configuree
-- Les logs de chaque composant sont dans la timezone de leur processus
+- The Python orchestrator uses `datetime.now()` (VPS local time)
+- The executor uses the time from its third-party service (API, database, cloud provider)
+- Cron jobs use their own configured timezone
+- Each component's logs are in its own process timezone
 
-Le code typique du bug :
+The typical buggy code:
 
 ```python
-# BUG: datetime.now() retourne l'heure locale, pas UTC
+# BUG: datetime.now() returns local time, not UTC
 current_hour = datetime.now().hour
 
-# Ce filtre est cense bloquer hors de 12h-18h UTC
-# Mais sur un serveur en UTC+3, il bloque hors de 12h-18h LOCAL = 9h-15h UTC
+# This filter is supposed to block outside 12–18 UTC
+# But on a UTC+3 server, it blocks outside 12–18 LOCAL = 09:00–15:00 UTC
 if not (12 <= current_hour < 18):
     return "BLOCKED — outside active window"
 ```
 
-Le probleme fondamental est l'**hypothese implicite de timezone**. Le developpeur ecrit `datetime.now().hour` en pensant "heure UTC" parce que son poste de dev est en UTC. En production, `datetime.now()` retourne l'heure du serveur, qui peut etre n'importe quoi.
+The fundamental problem is the **implicit timezone assumption**. The developer writes `datetime.now().hour` thinking "UTC time" because their dev machine is in UTC. In production, `datetime.now()` returns the server time, which could be anything.
 
-Le mismatch se propage dans tout le systeme :
+The mismatch propagates throughout the system:
 
 ```
-Composant A (UTC)      : "Il est 14h, fenetre active"
-Composant B (UTC+3)    : "Il est 17h, fenetre active"
-Composant C (UTC-5)    : "Il est 9h, hors fenetre"
-                          → 3 composants, 3 heures differentes, 3 decisions differentes
+Component A (UTC)      : "It's 14:00, window active"
+Component B (UTC+3)    : "It's 17:00, window active"
+Component C (UTC-5)    : "It's 09:00, outside window"
+                          -> 3 components, 3 different times, 3 different decisions
 ```
 
-Les variantes du meme bug incluent :
-- `time.time()` qui retourne un timestamp POSIX (toujours UTC, correct) mais converti en heure locale via `time.localtime()` au lieu de `time.gmtime()`
-- `datetime.utcnow()` qui retourne un objet **timezone-naive** (pas d'info timezone attachee), ce qui le rend impossible a comparer correctement avec un datetime timezone-aware
-- Des timestamps stockes en "local time + suffixe Z" : `datetime.now().isoformat() + "Z"` produit un timestamp qui **pretend** etre UTC mais qui est en heure locale
+Variants of the same bug include:
+- `time.time()` returning a POSIX timestamp (always UTC, correct) but converted to local time via `time.localtime()` instead of `time.gmtime()`
+- `datetime.utcnow()` returning a **timezone-naive** object (no timezone info attached), making it impossible to compare reliably with a timezone-aware datetime
+- Timestamps stored as "local time + Z suffix": `datetime.now().isoformat() + "Z"` produces a timestamp that **claims** to be UTC but is actually local time
 
 ## 4. Detection
 
-### 4.1 Detection manuelle (audit code)
+### 4.1 Manual code audit
 
-Chercher toutes les sources de temps dans la codebase :
+Search for all time sources in the codebase:
 
 ```bash
-# Chercher les appels datetime.now() sans timezone
+# Find datetime.now() calls without timezone
 grep -rn "datetime\.now()" --include="*.py" | grep -v "timezone"
 
-# Chercher utcnow() deprecie (Python 3.12+)
+# Find deprecated utcnow() (Python 3.12+)
 grep -rn "\.utcnow()" --include="*.py"
 
-# Chercher les conversions localtime potentiellement dangereuses
+# Find potentially dangerous localtime conversions
 grep -rn "localtime\|mktime\|strftime" --include="*.py"
 
-# Chercher les suffixes "Z" ajoutes manuellement (faux UTC)
+# Find manually appended "Z" suffixes (fake UTC)
 grep -rn '+ "Z"\|+"Z"\|+ "z"' --include="*.py"
 ```
 
-Chaque occurrence trouvee est suspecte. Verifier si le contexte d'execution (serveur, container, cron) a la meme timezone que ce que le code attend.
+Each occurrence found is suspect. Verify whether the execution context (server, container, cron) has the same timezone the code expects.
 
-### 4.2 Detection automatisee (CI/CD)
+### 4.2 Automated CI/CD
 
-Configurer `ruff` pour interdire les appels a `datetime.now()` sans timezone :
+Configure `ruff` to forbid `datetime.now()` calls without timezone:
 
 ```toml
-# ruff.toml ou pyproject.toml
+# ruff.toml or pyproject.toml
 [tool.ruff.lint]
 select = ["DTZ"]  # datetime-timezone rules
 # DTZ001: datetime.now() without tz
@@ -98,7 +98,7 @@ select = ["DTZ"]  # datetime-timezone rules
 # DTZ005: datetime.now().isoformat() without tz
 ```
 
-Ajouter un test custom qui echoue si un module utilise `datetime.now()` sans argument :
+Add a custom test that fails if any module uses `datetime.now()` without an argument:
 
 ```python
 import ast
@@ -119,9 +119,9 @@ def test_no_naive_datetime_now():
     assert not violations, f"datetime.now() without tz found:\n" + "\n".join(violations)
 ```
 
-### 4.3 Detection runtime (production)
+### 4.3 Runtime production
 
-Comparer les timestamps entre composants a chaque cycle. Si le delta est proche d'un multiple d'heure, c'est un mismatch timezone :
+Compare timestamps between components at each cycle. If the delta is close to a multiple of one hour, it's a timezone mismatch:
 
 ```python
 from datetime import datetime, timezone, timedelta
@@ -133,13 +133,6 @@ def check_component_clock_drift(
     """
     Compare timestamps from different components.
     If delta is close to a multiple of 1 hour, flag as timezone mismatch.
-
-    Args:
-        timestamps: {"component_name": datetime_with_tz, ...}
-        max_drift_seconds: normal drift tolerance (network lag)
-
-    Returns:
-        List of alert messages.
     """
     alerts = []
     components = list(timestamps.keys())
@@ -162,34 +155,27 @@ def check_component_clock_drift(
                 )
 
     return alerts
-
-# Usage in a health check loop
-def periodic_clock_audit(agent_timestamps: dict[str, datetime]):
-    alerts = check_component_clock_drift(agent_timestamps)
-    for alert in alerts:
-        logging.critical(alert)
-        # Send to monitoring (Telegram, Slack, PagerDuty, etc.)
 ```
 
-En complement, ajouter un champ `_tz_info` dans chaque message inter-agents qui indique la timezone du composant emetteur. Si un recepteur voit un `_tz_info` different du sien, il peut alerter immediatement.
+As a complement, add a `_tz_info` field in every inter-agent message indicating the sender's timezone. If a receiver sees a different `_tz_info` than its own, it can alert immediately.
 
-## 5. Correction
+## 5. Fix
 
-### 5.1 Fix immediat
+### 5.1 Immediate fix
 
-Remplacer chaque appel `datetime.now()` par `datetime.now(timezone.utc)` :
+Replace every `datetime.now()` call with `datetime.now(timezone.utc)`:
 
 ```python
 from datetime import datetime, timezone
 
-# AVANT (bug)
+# BEFORE (bug)
 current_hour = datetime.now().hour
 
-# APRES (fix)
+# AFTER (fix)
 current_hour = datetime.now(timezone.utc).hour
 ```
 
-Pour les composants non-Python (executeurs externes, services tiers), convertir explicitement leur timestamp en UTC avant toute comparaison :
+For non-Python components (external executors, third-party services), explicitly convert their timestamps to UTC before any comparison:
 
 ```python
 from datetime import datetime, timezone, timedelta
@@ -199,9 +185,9 @@ def external_time_to_utc(external_time: datetime, known_offset_hours: int) -> da
     return external_time.replace(tzinfo=None) - timedelta(hours=known_offset_hours)
 ```
 
-### 5.2 Fix robuste
+### 5.2 Robust fix
 
-Centraliser toute obtention de temps dans un module unique. Aucun composant n'appelle `datetime.now()` directement — tous passent par ce module :
+Centralize all time retrieval in a single module. No component calls `datetime.now()` directly — all go through this module:
 
 ```python
 """time_utils.py — Single source of truth for all time operations."""
@@ -210,7 +196,6 @@ from datetime import datetime, timezone, timedelta
 class Clock:
     """Centralized time provider. All components use this, never datetime.now() directly."""
 
-    # Known external system offsets (configure per deployment)
     OFFSETS = {
         "server_eu": 3,     # UTC+3
         "server_us": -5,    # UTC-5 (EST)
@@ -245,54 +230,54 @@ if Clock.is_in_window(12, 18):
     agent.execute()
 ```
 
-## 6. Prevention architecturale
+## 6. Architectural Prevention
 
-La regle fondamentale : **un seul type de temps dans tout le systeme, et c'est UTC**. Pas d'exceptions, pas de "juste ici c'est en local pour la lisibilite", pas de "on convertit au dernier moment".
+The fundamental rule: **one type of time throughout the entire system, and it's UTC**. No exceptions, no "just here it's local for readability", no "we'll convert at the last moment".
 
-Concretement, cela implique trois decisions architecturales :
+Concretely, this implies three architectural decisions:
 
-**1. Un module `Clock` centralise.** Aucun composant n'importe `datetime` directement. Tout passe par un module qui garantit UTC + timezone-aware. Ce module est le seul a connaitre les offsets des systemes externes.
+**1. A centralized `Clock` module.** No component imports `datetime` directly. Everything goes through a module that guarantees UTC + timezone-aware. This module is the only one that knows external system offsets.
 
-**2. Les timestamps stockes sont toujours en ISO-8601 avec timezone.** Pas de `"2026-04-09 14:30:00"` sans timezone. Toujours `"2026-04-09T14:30:00+00:00"` ou `"2026-04-09T14:30:00Z"`. La presence explicite du `+00:00` rend le bug impossible a ignorer.
+**2. Stored timestamps are always ISO-8601 with timezone.** Not `"2026-04-09 14:30:00"` without timezone. Always `"2026-04-09T14:30:00+00:00"` or `"2026-04-09T14:30:00Z"`. The explicit `+00:00` makes the bug impossible to ignore.
 
-**3. Les tests d'integration s'executent dans une timezone non-UTC.** Ajouter `TZ=Pacific/Chatham` (UTC+12:45, la timezone la plus exotique au monde) dans le CI pour forcer les hypotheses implicites a exploser immediatement. Si un test passe en UTC et echoue en UTC+12:45, il y a un bug de timezone.
+**3. Integration tests run in a non-UTC timezone.** Add `TZ=Pacific/Chatham` (UTC+12:45, the world's most exotic timezone) in CI to force implicit assumptions to explode immediately. If a test passes in UTC and fails in UTC+12:45, there's a timezone bug.
 
-## 7. Anti-patterns a eviter
+## 7. Anti-patterns to Avoid
 
-1. **`datetime.now()` sans argument timezone.** C'est le bug sous sa forme la plus courante. Remplacer systematiquement par `datetime.now(timezone.utc)`.
+1. **`datetime.now()` without a timezone argument.** This is the bug in its most common form. Systematically replace with `datetime.now(timezone.utc)`.
 
-2. **`datetime.utcnow()`** (deprecie depuis Python 3.12). Il retourne un datetime timezone-naive qui **pretend** etre UTC mais ne porte pas l'information. Il ne peut pas etre compare de maniere fiable avec un datetime timezone-aware.
+2. **`datetime.utcnow()`** (deprecated since Python 3.12). It returns a timezone-naive datetime that **pretends** to be UTC but doesn't carry the information. It cannot be reliably compared with a timezone-aware datetime.
 
-3. **Ajouter `"Z"` manuellement a un timestamp.** `datetime.now().isoformat() + "Z"` produit un timestamp qui dit "UTC" mais qui est en heure locale. C'est un mensonge dans les metadonnees.
+3. **Manually appending `"Z"` to a timestamp.** `datetime.now().isoformat() + "Z"` produces a timestamp that says "UTC" but is actually in local time. It's a lie in the metadata.
 
-4. **Comparer des timestamps sans verifier leur timezone.** `time_a > time_b` quand l'un est en UTC et l'autre en local donne un resultat faux sans lever d'erreur.
+4. **Comparing timestamps without checking their timezone.** `time_a > time_b` when one is UTC and the other is local gives a wrong result without raising an error.
 
-5. **Assumer que le serveur est en UTC.** Meme si c'est vrai aujourd'hui, une migration de serveur, un changement de cloud provider, ou un passage a l'heure d'ete peut changer la timezone silencieusement.
+5. **Assuming the server is in UTC.** Even if it's true today, a server migration, cloud provider change, or DST transition can silently change the timezone.
 
-## 8. Cas limites et variantes
+## 8. Edge Cases and Variants
 
-**Variante 1 : DST (heure d'ete/hiver).** Certaines timezones changent de +2 a +3 selon la saison (Europe). Le bug peut apparaitre ou disparaitre deux fois par an, rendant le diagnostic extremement difficile. Un serveur en Europe centrale est en UTC+1 l'hiver et UTC+2 l'ete — meme avec un offset connu, il change.
+**Variant 1: DST (Daylight Saving Time).** Some timezones shift from +2 to +3 seasonally (Europe). The bug can appear or disappear twice a year, making diagnosis extremely difficult. A Central European server is UTC+1 in winter and UTC+2 in summer — even with a known offset, it changes.
 
-**Variante 2 : Microservices multi-cloud.** L'agent A tourne sur AWS (UTC par defaut), l'agent B sur GCP (UTC par defaut aussi, mais le container peut avoir une timezone custom), l'agent C tourne sur un VPS on-premise (timezone locale du pays). Trois sources de temps differentes pour le meme systeme.
+**Variant 2: Multi-cloud microservices.** Agent A runs on AWS (UTC by default), Agent B on GCP (UTC by default too, but the container may have a custom timezone), Agent C runs on an on-premise VPS (country's local timezone). Three different time sources for the same system.
 
-**Variante 3 : Timestamps dans les fichiers de communication.** Un agent ecrit un fichier JSON avec `"created_at": "2026-04-09 14:30"` en heure locale. Un autre agent lit ce fichier et interprete le timestamp comme UTC. Le fichier ne contient aucune information de timezone — impossible de savoir qui a raison sans connaitre le contexte de creation.
+**Variant 3: Timestamps in communication files.** An agent writes a JSON file with `"created_at": "2026-04-09 14:30"` in local time. Another agent reads this file and interprets the timestamp as UTC. The file contains no timezone information — impossible to know who's right without knowing the creation context.
 
-**Variante 4 : Bases de donnees avec timezone implicite.** SQLite stocke les datetimes comme du texte sans timezone. PostgreSQL a un type `TIMESTAMP WITH TIME ZONE` mais aussi `TIMESTAMP WITHOUT TIME ZONE`. Si un composant ecrit sans timezone et un autre lit en assumant UTC, le decalage s'installe silencieusement.
+**Variant 4: Databases with implicit timezone.** SQLite stores datetimes as text without timezone. PostgreSQL has `TIMESTAMP WITH TIME ZONE` but also `TIMESTAMP WITHOUT TIME ZONE`. If one component writes without timezone and another reads assuming UTC, the offset installs silently.
 
-## 9. Checklist d'audit
+## 9. Audit Checklist
 
-- [ ] Aucun appel `datetime.now()` sans argument `tz=timezone.utc` dans la codebase
-- [ ] Aucun appel `datetime.utcnow()` (deprecie Python 3.12+)
-- [ ] Tous les timestamps stockes (fichiers, DB, messages) contiennent une timezone explicite
-- [ ] Les tests CI s'executent dans une timezone non-UTC (ex: `TZ=Pacific/Chatham`)
-- [ ] Un module `Clock` centralise ou une convention documentee impose UTC partout
-- [ ] Les timestamps des composants externes sont convertis en UTC avant comparaison
-- [ ] Un health check compare les horloges entre composants et alerte si drift > 5min
+- [ ] No `datetime.now()` call without `tz=timezone.utc` argument in the codebase
+- [ ] No `datetime.utcnow()` call (deprecated Python 3.12+)
+- [ ] All stored timestamps (files, DB, messages) contain an explicit timezone
+- [ ] CI tests run in a non-UTC timezone (e.g., `TZ=Pacific/Chatham`)
+- [ ] A centralized `Clock` module or documented convention enforces UTC everywhere
+- [ ] External component timestamps are converted to UTC before comparison
+- [ ] A health check compares clocks between components and alerts if drift > 5min
 
-## 10. Pour aller plus loin
+## 10. Further Reading
 
-- Pattern court correspondant : [Pattern 01 — Timezone Mismatch](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-01)
-- Patterns connexes : #04 (Multi-File State Desync — les timestamps dans les fichiers partages peuvent etre en timezones differentes), #08 (Data Pipeline Freeze — un timestamp mal interprete peut faire croire que des donnees sont fraiches alors qu'elles sont stales)
-- Lectures recommandees :
-  - "Falsehoods programmers believe about time" (Zach Holman, 2015) — la reference sur les hypotheses implicites en gestion du temps
-  - Documentation Python `datetime` (section timezone-aware vs timezone-naive) — la distinction fondamentale que tout dev Python doit maitriser
+- Short pattern: [Pattern 01 — Timezone Mismatch](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-01)
+- Related patterns: #04 (Multi-File State Desync — timestamps in shared files can be in different timezones), #08 (Data Pipeline Freeze — a misinterpreted timestamp can make data appear fresh when it's stale)
+- Recommended reading:
+  - "Falsehoods programmers believe about time" (Zach Holman, 2015) — the reference on implicit assumptions in time handling
+  - Python `datetime` documentation (timezone-aware vs timezone-naive section) — the fundamental distinction every Python developer must master

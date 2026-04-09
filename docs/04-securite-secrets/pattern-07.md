@@ -1,70 +1,70 @@
-# Pattern N°07 — Hardcoded Secret in Source
+# Pattern #07 — Hardcoded Secret in Source
 
-**Categorie :** Securite & Secrets
-**Severite :** Critical
-**Frameworks impactes :** LangChain / CrewAI / AutoGen / LangGraph / Custom
-**Temps moyen de debogage si non detecte :** 0 jours a indefini (la fuite n'est pas un "bug" a debugger — elle est invisible jusqu'a exploitation, qui peut prendre des minutes ou des annees)
+**Category:** Security & Secrets
+**Severity:** Critical
+**Frameworks affected:** LangChain / CrewAI / AutoGen / LangGraph / Custom
+**Average debug time if undetected:** 0 days to indefinite (the leak is not a "bug" to debug — it is invisible until exploited, which can happen in minutes or take years)
 
 ---
 
-## 1. Symptome observable
+## 1. Observable Symptoms
 
-Un scan de securite (truffleHog, gitleaks, GitHub Secret Scanning) remonte des alertes pour des tokens ou cles API en clair dans le code source. Ou pire : la facture du provider LLM explose sans explication — quelqu'un a recupere la cle exposee dans l'historique git et l'utilise pour ses propres appels.
+A security scanner (truffleHog, gitleaks, GitHub Secret Scanning) raises alerts for plaintext tokens or API keys in the source code. Or worse: the LLM provider bill explodes without explanation — someone retrieved the key exposed in the git history and is using it for their own API calls.
 
-Dans les systemes multi-agents, le symptome le plus courant est la **multiplication des credentials**. Chaque agent a ses propres connexions : LLM provider, base de donnees, service de notification, API externe. Un systeme a 5 agents peut avoir 15-20 credentials differents, chacun potentiellement hardcode dans un fichier different.
+In multi-agent systems, the most common symptom is the **proliferation of credentials**. Each agent has its own connections: LLM provider, database, notification service, external API. A 5-agent system may have 15–20 distinct credentials, each potentially hardcoded in a different file.
 
-Un autre symptome : des messages ou actions non autorisees apparaissent dans les canaux de notification du systeme. Un token de bot expose permet a quiconque d'envoyer des messages via le bot — les messages apparaissent comme venant du systeme alors qu'ils viennent d'un attaquant.
+Another symptom: unauthorized messages or actions appear in the system's notification channels. An exposed bot token allows anyone to send messages through the bot — the messages appear to come from the system when they actually originate from an attacker.
 
-## 2. Histoire vecue (anonymisee)
+## 2. Field Story (anonymized)
 
-Un developpeur a hardcode le token de son bot de notification dans un script Python pour "tester rapidement". Le script a ete committe dans un repo prive partage avec 3 collaborateurs. Six mois plus tard, le repo a ete rendu public pour partager un composant open-source avec la communaute. Personne n'a pense a verifier l'historique git.
+A developer hardcoded their notification bot token in a Python script for "quick testing." The script was committed to a private repository shared with 3 collaborators. Six months later, the repository was made public to share an open-source component with the community. No one thought to check the git history.
 
-En 24 heures, un bot scanner (il en existe des centaines qui scrutent les push publics GitHub en temps reel) a detecte le token. L'attaquant a utilise le bot pour envoyer des messages dans le canal de notification de l'equipe : des liens de phishing deguises en alertes systeme. Un membre de l'equipe a clique, compromettant un second credential.
+Within 24 hours, a bot scanner (hundreds of them continuously monitor public GitHub pushes in real time) detected the token. The attacker used the bot to post messages in the team's notification channel: phishing links disguised as system alerts. A team member clicked one, compromising a second credential.
 
-Le cout total de l'incident : revocation de 4 credentials, 2 jours de travail pour auditer l'historique git, et une perte de confiance dans la securite du systeme qui a conduit a une refonte complete de la gestion des secrets.
+Total cost of the incident: revocation of 4 credentials, 2 days of work to audit the git history, and a loss of confidence in the system's security that led to a complete overhaul of secret management.
 
-## 3. Cause racine technique
+## 3. Technical Root Cause
 
-Le pattern est presque toujours le meme : un dev hardcode un secret "temporairement" pendant le developpement, et oublie de le retirer avant le commit :
+The pattern is almost always the same: a developer hardcodes a secret "temporarily" during development and forgets to remove it before committing:
 
 ```python
-# "Je le mettrai dans .env plus tard" — message d'il y a 6 mois
+# "I'll move it to .env later" — a message from 6 months ago
 API_KEY = "sk-proj-abc123def456ghi789jkl012mno345"
 BOT_TOKEN = "8679765924:AAF3d5__KxB2nM7qR9zWpLkJh"
 DB_PASSWORD = "SuperSecret123!"
 ```
 
-Le probleme est aggrave par trois facteurs dans les systemes multi-agents :
+The problem is compounded by three factors in multi-agent systems:
 
-**1. Nombre de credentials.** Un systeme multi-agents typique connecte 3-5 services externes. Chaque agent peut avoir son propre set de credentials. Le nombre total de secrets a gerer croit lineairement avec le nombre d'agents.
+**1. Number of credentials.** A typical multi-agent system connects 3–5 external services. Each agent may have its own set of credentials. The total number of secrets to manage grows linearly with the number of agents.
 
-**2. Code distribue entre plusieurs fichiers.** Les credentials sont parfois dans le fichier principal (`main.py`), parfois dans des fichiers de configuration (`config.py`), parfois dans des scripts utilitaires (`send_alert.py`). Un audit doit couvrir toute la codebase, pas juste un fichier.
+**2. Code distributed across multiple files.** Credentials sometimes live in the main file (`main.py`), sometimes in configuration files (`config.py`), sometimes in utility scripts (`send_alert.py`). An audit must cover the entire codebase, not just one file.
 
-**3. L'historique git conserve tout.** Supprimer un secret du code actuel ne suffit PAS. Le secret reste dans l'historique git indefiniment. `git log -p | grep "sk-"` le retrouvera instantanement. La seule solution est de **revoquer** le secret et d'en generer un nouveau.
+**3. Git history retains everything.** Removing a secret from the current code is NOT enough. The secret persists in the git history indefinitely. `git log -p | grep "sk-"` will find it instantly. The only solution is to **revoke** the secret and generate a new one.
 
 ## 4. Detection
 
-### 4.1 Detection manuelle (audit code)
+### 4.1 Manual code audit
 
-Scanner la codebase et l'historique pour les patterns courants de secrets :
+Scan the codebase and history for common secret patterns:
 
 ```bash
-# Chercher les patterns de cles API
+# Search for API key patterns
 grep -rn "sk-\|Bearer \|token.*=.*['\"][a-zA-Z0-9]" --include="*.py"
 
-# Chercher les passwords hardcodes
+# Search for hardcoded passwords
 grep -rn "password\s*=\s*['\"]" --include="*.py" -i
 
-# Scanner l'historique git complet
+# Scan the full git history
 git log -p --all | grep -i "api_key\|token\|password\|secret" | head -20
 
-# Verifier que .env n'est pas committe
+# Verify that .env has not been committed
 git ls-files | grep -i "\.env$"
 ```
 
-### 4.2 Detection automatisee (CI/CD)
+### 4.2 Automated CI/CD
 
-Installer un scanner de secrets comme pre-commit hook ET dans la CI :
+Install a secret scanner as a pre-commit hook AND in CI:
 
 ```yaml
 # .pre-commit-config.yaml
@@ -81,7 +81,7 @@ repos:
       - id: detect-secrets
 ```
 
-Configuration `gitleaks` pour un projet multi-agents :
+`gitleaks` configuration for a multi-agent project:
 
 ```toml
 # .gitleaks.toml
@@ -100,9 +100,9 @@ regex = '''\d{8,12}:[A-Za-z0-9_-]{30,}'''
 tags = ["token", "bot"]
 ```
 
-### 4.3 Detection runtime (production)
+### 4.3 Runtime production
 
-Verifier au demarrage que les secrets sont charges depuis l'environnement, pas depuis le code :
+Verify at startup that secrets are loaded from the environment, not from code:
 
 ```python
 import os
@@ -130,25 +130,25 @@ def validate_secrets_at_startup():
         sys.exit(1)
 ```
 
-## 5. Correction
+## 5. Fix
 
-### 5.1 Fix immediat
+### 5.1 Immediate fix
 
-1. Revoquer le secret compromis immediatement (regenerer la cle chez le provider)
-2. Deplacer le secret dans `.env`
-3. Ajouter `.env` au `.gitignore`
+1. Revoke the compromised secret immediately (regenerate the key with the provider)
+2. Move the secret into `.env`
+3. Add `.env` to `.gitignore`
 
 ```python
-# AVANT (bug)
+# BEFORE (bug)
 API_KEY = "sk-proj-abc123def456"
 
-# APRES (fix)
+# AFTER (fix)
 import os
 API_KEY = os.environ["LLM_API_KEY"]
 ```
 
 ```bash
-# .env (JAMAIS committe)
+# .env (NEVER committed)
 LLM_API_KEY=sk-proj-abc123def456
 
 # .gitignore
@@ -156,9 +156,9 @@ LLM_API_KEY=sk-proj-abc123def456
 .env.*
 ```
 
-### 5.2 Fix robuste
+### 5.2 Robust fix
 
-Utiliser un module centralise de gestion des secrets avec validation :
+Use a centralized secret management module with validation:
 
 ```python
 """secrets_manager.py — Centralized secret loading with validation."""
@@ -203,55 +203,55 @@ class Secrets:
 secrets = Secrets()
 ```
 
-## 6. Prevention architecturale
+## 6. Architectural Prevention
 
-La prevention repose sur la **defense en profondeur** — plusieurs couches qui rendent la fuite progressivement plus difficile :
+Prevention relies on **defense in depth** — multiple layers that make a leak progressively harder:
 
-**Couche 1 : .env + .gitignore.** Les secrets vivent dans `.env`, exclus du git. Un `.env.example` avec des placeholders sert de documentation.
+**Layer 1: .env + .gitignore.** Secrets live in `.env`, excluded from git. A `.env.example` with placeholders serves as documentation.
 
-**Couche 2 : Pre-commit hook.** gitleaks ou detect-secrets bloque tout commit contenant un pattern de secret. Le dev ne peut pas committer "par accident".
+**Layer 2: Pre-commit hook.** gitleaks or detect-secrets blocks any commit containing a secret pattern. The developer cannot commit one "by accident."
 
-**Couche 3 : CI scan.** Meme si le pre-commit est contourne (push --no-verify), la CI scanne chaque PR et bloque le merge si un secret est detecte.
+**Layer 3: CI scan.** Even if the pre-commit hook is bypassed (`push --no-verify`), CI scans every PR and blocks the merge if a secret is detected.
 
-**Couche 4 : Rotation.** Chaque secret a une date d'expiration. Un cron job alerte si un secret n'a pas ete rotationnel depuis > 90 jours.
+**Layer 4: Rotation.** Every secret has an expiry date. A cron job alerts if a secret has not been rotated in more than 90 days.
 
-**Couche 5 : Moindre privilege.** Chaque agent a sa propre cle avec des permissions minimales. Si un agent est compromis, seules ses permissions sont exposees.
+**Layer 5: Least privilege.** Each agent has its own key with minimal permissions. If one agent is compromised, only its permissions are exposed.
 
-## 7. Anti-patterns a eviter
+## 7. Anti-patterns to Avoid
 
-1. **"Je le mettrai dans .env plus tard."** Le "plus tard" n'arrive jamais. Mettre dans .env immediatement, meme en phase de prototypage.
+1. **"I'll move it to .env later."** "Later" never comes. Put it in `.env` immediately, even during prototyping.
 
-2. **Supprimer le secret du code et considerer le probleme resolu.** L'historique git conserve tout. Si le secret a ete committe, il faut le revoquer.
+2. **Removing the secret from the code and considering the problem solved.** Git history retains everything. If the secret was ever committed, it must be revoked.
 
-3. **Utiliser le meme secret pour tous les agents.** Si la cle est compromise, tout le systeme est expose. Un secret par agent.
+3. **Using the same secret for all agents.** If the key is compromised, the entire system is exposed. One secret per agent.
 
-4. **Stocker les secrets dans un fichier JSON committe.** `config.json` avec les cles API, meme dans un repo prive, est une fuite en attente.
+4. **Storing secrets in a committed JSON file.** A `config.json` containing API keys, even in a private repository, is a leak waiting to happen.
 
-5. **Logger les secrets.** `print(f"Using API key: {API_KEY}")` dans les logs expose le secret a quiconque a acces aux logs.
+5. **Logging secrets.** `print(f"Using API key: {API_KEY}")` in logs exposes the secret to anyone with log access.
 
-## 8. Cas limites et variantes
+## 8. Edge Cases and Variants
 
-**Variante 1 : Secrets dans les variables d'environnement du CI.** Correctement configurees, elles sont securisees. Mais si un step du CI fait `env | sort` ou `printenv` dans un log public, les secrets sont exposes.
+**Variant 1: Secrets in CI environment variables.** When properly configured, these are secure. However, if a CI step runs `env | sort` or `printenv` in a public log, the secrets are exposed.
 
-**Variante 2 : Secrets dans les fichiers Docker.** Un `COPY .env .` dans un Dockerfile inclut le fichier dans l'image. Toute personne ayant l'image peut extraire les secrets avec `docker inspect`.
+**Variant 2: Secrets in Docker files.** A `COPY .env .` instruction in a Dockerfile bundles the file into the image. Anyone with access to the image can extract secrets with `docker inspect`.
 
-**Variante 3 : Secrets dans les notebooks Jupyter.** Les cellules de notebook contiennent souvent des cles API pour les demos. Les notebooks sont commites avec leurs outputs — incluant les cles.
+**Variant 3: Secrets in Jupyter notebooks.** Notebook cells frequently contain API keys for demos. Notebooks are committed with their outputs — including the keys.
 
-**Variante 4 : Secrets en clair dans les logs de debug.** Le code fait `logger.debug(f"Request headers: {headers}")`. Les headers contiennent `Authorization: Bearer sk-...`. Le secret finit dans le fichier de log.
+**Variant 4: Secrets in plaintext debug logs.** Code does `logger.debug(f"Request headers: {headers}")`. The headers contain `Authorization: Bearer sk-...`. The secret ends up in the log file.
 
-## 9. Checklist d'audit
+## 9. Audit Checklist
 
-- [ ] Aucun secret n'apparait dans le code source (verifie par grep + gitleaks)
-- [ ] `.env` est dans `.gitignore` et n'a jamais ete committe (verifie par `git log`)
-- [ ] Un `.env.example` avec des placeholders existe et est a jour
-- [ ] Un pre-commit hook bloque les commits avec des secrets
-- [ ] Chaque secret a ete genere/rotationne dans les 90 derniers jours
-- [ ] Chaque agent a ses propres credentials (pas de partage de cles)
+- [ ] No secret appears in source code (verified by grep + gitleaks)
+- [ ] `.env` is in `.gitignore` and has never been committed (verified by `git log`)
+- [ ] A `.env.example` with placeholders exists and is up to date
+- [ ] A pre-commit hook blocks commits containing secrets
+- [ ] Every secret has been generated or rotated within the last 90 days
+- [ ] Each agent has its own credentials (no key sharing)
 
-## 10. Pour aller plus loin
+## 10. Further Reading
 
-- Pattern court correspondant : [Pattern 07 — Hardcoded Secret in Source](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-07)
-- Patterns connexes : #04 (Multi-File State Desync — les secrets peuvent etre dans plusieurs fichiers non synchronises), #11 (Race Condition on Shared File — un fichier .env partage entre agents peut avoir des race conditions)
-- Lectures recommandees :
+- Corresponding short pattern: [Pattern 07 — Hardcoded Secret in Source](https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-07)
+- Related patterns: #04 (Multi-File State Desync — secrets can live across multiple unsynchronized files), #11 (Race Condition on Shared File — a `.env` file shared between agents can be subject to race conditions)
+- Recommended reading:
   - "OWASP Top 10" (2021) — A07:2021 Identification and Authentication Failures
-  - Documentation GitHub sur le Secret Scanning — la detection automatique de secrets dans les repos publics et prives
+  - GitHub documentation on Secret Scanning — automatic detection of secrets in public and private repositories
