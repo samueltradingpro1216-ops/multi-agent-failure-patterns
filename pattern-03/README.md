@@ -1,25 +1,31 @@
-# Pattern 03 — Cascade de Pénalités (Mardi Noir)
+# Pattern 03 — Cascade de Penalites (effet multiplicatif)
 
-## Le bug
-
-Plusieurs agents modifient le même paramètre (ex: Risk_Percent) indépendamment dans le même cycle. Chaque modification est raisonnable seule, mais la cascade les multiplie.
+> Applicable a : tout systeme multi-agents ou plusieurs agents ajustent le meme parametre (priorite de tache, budget de tokens, timeout, score de confiance). Frequent avec CrewAI quand plusieurs agents ont un droit de modification sur la meme config partagee.
 
 ## Symptome
 
-- Risk tombe à 0.01% au lieu de 0.25% (14x trop petit)
-- Lots microscopiques, gains en centimes
-- Se produit quand plusieurs conditions négatives coïncident (ex: mardi + nuit + drawdown)
+- Un parametre tombe a une valeur absurdement basse (ex: 7% de sa valeur nominale)
+- Le systeme fonctionne techniquement mais produit des resultats negligeables
+- Se produit quand plusieurs conditions negatives coincident (ex: mardi + nuit + charge elevee)
 
 ## Cause racine
 
-5 modules font un read-modify-write indépendant : `0.8 × 0.5 × 0.7 × 0.5 × 0.5 = 0.07` du nominal. Chaque agent ignore les ajustements des autres.
+N modules font un read-modify-write independant sur le meme parametre dans le meme cycle. Chaque reduction est raisonnable seule (-20%, -30%, -50%), mais la cascade les multiplie : `0.8 x 0.5 x 0.7 x 0.5 x 0.5 = 0.07` du nominal.
 
-## Quick fix
+## Detection
 
-Pipeline accumulatif avec floor cumulatif à 30%. Voir `example.py`.
+Analyser l'audit trail des ecritures. Si > 3 modifications du meme parametre en < 60s avec un ratio final/initial < 20%, c'est une cascade. Voir `example.py`.
+
+## Correction
+
+Pipeline accumulatif : les modules proposent des multiplicateurs, une seule fonction applique le resultat final avec un floor cumulatif (jamais reduire de plus de 70%). Voir `example.py`.
+
+## Prevention
+
+- Interdire les read-modify-write directs sur les parametres partages
+- Floor cumulatif configurable (ex: 0.3 = reduction max 70%)
+- Alerter si un parametre < 50% de sa valeur nominale pendant > 1h
 
 ## Playbook complet
 
-Le playbook payant contient : détection par audit trail, pipeline complet avec logs, alertes sur réduction excessive, et pattern d'architecture détaillé.
-
-[Multi-Agent Debug Patterns — Playbook complet](https://example.com/playbook)
+Fiche detaillee avec pipeline complet, audit trail, et alerting : [lien a venir]

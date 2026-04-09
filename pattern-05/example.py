@@ -108,7 +108,7 @@ if __name__ == "__main__":
     print("Pattern 05 — Lot Size 100x")
     print("=" * 60)
 
-    balance = 7500.0
+    balance = 10000.0
     risk_pct = 0.25
     sl_points = 45.0
 

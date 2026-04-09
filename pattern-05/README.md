@@ -1,25 +1,32 @@
-# Pattern 05 — Lot Size 100x (Point Value Mismatch)
+# Pattern 05 — Unit Mismatch 100x
 
-## Le bug
-
-Deux modules utilisent des point values différentes pour le même asset. Le calcul de lot utilise `point=0.01` au lieu de `point=1.0` pour BTC → lot 100x trop gros.
+> Applicable a : tout systeme ou des agents manipulent des valeurs avec des unites (tokens, prix, scores, tailles). Frequent dans les pipelines LangChain qui melangent des couts en dollars et en centimes, ou dans les systemes AutoGen qui calculent des budgets de tokens avec des unites differentes selon les modules.
 
 ## Symptome
 
-- Lot = 0.50 au lieu de 0.005 (100x trop gros)
-- Risk réel = 6.3% du compte au lieu de 0.25%
-- Un seul trade peut tuer le compte
+- Une action est executee avec une magnitude 10x-100x trop grande (ou trop petite)
+- Un seul appel consomme tout le budget (tokens, API calls, ressources)
+- Le calcul utilise la bonne formule, le bon pourcentage, mais la **valeur unitaire** est fausse
 
 ## Cause racine
 
-Point value hardcodée dans chaque module au lieu d'être centralisée. Un copier-coller depuis un autre asset (XAUUSD point=0.01) a été utilisé pour BTC (point devrait être 1.0).
+Deux modules utilisent des valeurs unitaires differentes pour la meme entite. Un module dit "1 unite = 1.0", l'autre dit "1 unite = 0.01" (copie-colle depuis un autre contexte). La formule `quantite = budget / (distance * unit_value)` donne un resultat 100x trop grand.
 
-## Quick fix
+## Detection
 
-Centraliser les point values dans une config unique + garde-fou LOT_TOO_BIG. Voir `example.py`.
+Lister toutes les valeurs unitaires par entite et par module. Si deux modules ont des valeurs differentes pour la meme entite, c'est un mismatch. Voir `example.py`.
+
+## Correction
+
+Centraliser les valeurs unitaires dans une config unique. Ajouter un garde-fou "TOO_BIG" : avant chaque action, verifier que la magnitude ne depasse pas un seuil absolu. Voir `example.py`.
+
+## Prevention
+
+- Source unique pour les valeurs unitaires (fichier de config ou classe)
+- Garde-fou absolu avant chaque action critique (si magnitude > 10x attendu -> bloquer)
+- Audit croise au demarrage : verifier que tous les modules lisent la meme config
+- Ne jamais copier-coller les valeurs unitaires entre modules
 
 ## Playbook complet
 
-Le playbook payant contient : audit croisé des point values au boot, garde-fou avec alerting, validation complète du lot sizing, et impact financier réel.
-
-[Multi-Agent Debug Patterns — Playbook complet](https://example.com/playbook)
+Fiche detaillee avec audit croise au boot, garde-fou complet, et analyse d'impact financier : [lien a venir]

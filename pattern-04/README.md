@@ -1,26 +1,32 @@
-# Pattern 04 — Killswitch Multi-File Desync
+# Pattern 04 — Multi-File State Desync
 
-## Le bug
-
-Le même état critique (killswitch/arrêt d'urgence) est stocké dans 3 fichiers différents, écrits par 3 composants différents, jamais synchronisés. Chaque composant lit "sa" version → états contradictoires.
+> Applicable a : tout systeme ou le meme etat est stocke en plusieurs endroits (fichiers, DB, cache, variables d'environnement). Tres frequent dans les systemes LangChain avec Redis + fichier config + variable env, ou dans les pipelines AutoGen avec etat distribue.
 
 ## Symptome
 
-- L'exécuteur refuse de trader (killswitch = ACTIVE dans son fichier)
-- Le superviseur envoie des commandes (killswitch = false dans sa config)
-- Le dashboard crash (fichier JSON absent)
-- Personne ne sait si le système est vraiment arrêté ou non
+- Un composant pense que le systeme est arrete, un autre pense qu'il tourne
+- Le dashboard crash car un fichier d'etat n'existe pas
+- 3 sources d'information donnent 3 reponses differentes pour la meme question
 
 ## Cause racine
 
-Pas de Single Source of Truth. Chaque version du système a ajouté sa propre source de vérité sans synchroniser les précédentes.
+L'etat a ete **duplique progressivement** au fil du developpement : V1 ecrit un fichier texte, V2 ajoute un JSON structure, V3 ajoute un champ dans la config. Les 3 sources ne sont jamais synchronisees. Pas de Single Source of Truth.
 
-## Quick fix
+## Detection
 
-Un KillswitchManager qui écrit dans TOUS les fichiers à chaque modification et lit depuis UN SEUL. Voir `example.py`.
+Pour chaque etat critique, lister toutes les sources qui le stockent. Comparer les valeurs et les dates de modification. Si les valeurs divergent ou si une source est stale (> 24h), c'est une desync. Voir `example.py`.
+
+## Correction
+
+Un manager centralise qui ecrit dans TOUTES les sources a chaque modification et lit depuis UNE SEULE (la source primaire). Voir `example.py`.
+
+## Prevention
+
+- Single Source of Truth obligatoire pour chaque etat critique
+- Sync periodique (toutes les 60s) qui re-aligne les copies
+- Audit de coherence a chaque cycle : toutes les copies doivent etre identiques
+- Chaque fichier d'etat contient `last_synced` — si > 5min, considerer comme stale
 
 ## Playbook complet
 
-Le playbook payant contient : audit de cohérence automatisé, pattern sync périodique, gestion des fichiers stale, et architecture complète.
-
-[Multi-Agent Debug Patterns — Playbook complet](https://example.com/playbook)
+Fiche detaillee avec manager complet, audit automatise, et gestion des fichiers stale : [lien a venir]

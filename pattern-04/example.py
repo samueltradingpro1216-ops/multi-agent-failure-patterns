@@ -183,7 +183,7 @@ if __name__ == "__main__":
         print(f"\n  Audit: {'OK (0 issues)' if not issues else issues}")
 
         # Désactiver
-        fixed.deactivate(deactivated_by="samuel")
+        fixed.deactivate(deactivated_by="admin")
         print(f"\n  Killswitch désactivé")
         print(f"  is_active(): {fixed.is_active()}")
         issues = fixed.audit()
