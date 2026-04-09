@@ -16,8 +16,8 @@ Mets une etoile pour soutenir le projet et recevoir les notifications de mises a
 
 ## Statut
 
-- **8 / 66 patterns** publies avec code executable
-- 58 patterns en cours de redaction
+- **11 / 66 patterns** publies avec code executable
+- 55 patterns en cours de redaction
 - English version coming soon
 
 ---
@@ -43,6 +43,15 @@ Mets une etoile pour soutenir le projet et recevoir les notifications de mises a
 
 ### I/O & Persistence
 - [Pattern 08 — Data Pipeline Freeze](pattern-08/) — Producteur change de format, consommateur lit des donnees gelees
+
+### Boucles & Orchestration
+- [Pattern 09 — Agent Infinite Loop](pattern-09/) — Agent recursif sans guard qui boucle indefiniment et explose les quotas
+
+### Filtrage & Decisions
+- [Pattern 10 — Survival Mode Deadlock](pattern-10/) — Seuil de confiance > score moyen = systeme bloque, aucune action executee
+
+### Gouvernance Multi-Agents
+- [Pattern 11 — Race Condition on Shared File](pattern-11/) — Pas de lock sur fichier partage entre agents, updates perdus
 
 ---
 
