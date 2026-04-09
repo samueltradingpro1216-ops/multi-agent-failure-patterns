@@ -1,0 +1,1699 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Catalogue technique des bugs critiques en architecture multi-agents IA, base sur 18 mois de production">
+      
+      
+        <meta name="author" content="Samuel Pages">
+      
+      
+        <link rel="canonical" href="https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/03-calculs-etat/pattern-05/">
+      
+      
+        <link rel="prev" href="../../02-boucles-orchestration/pattern-09/">
+      
+      
+        <link rel="next" href="../pattern-06/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>05 — Unit Mismatch 100x - Multi-Agent Failure Patterns</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#pattern-n05-unit-mismatch-100x" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Multi-Agent Failure Patterns" class="md-header__button md-logo" aria-label="Multi-Agent Failure Patterns" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Multi-Agent Failure Patterns
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              05 — Unit Mismatch 100x
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Multi-Agent Failure Patterns" class="md-nav__button md-logo" aria-label="Multi-Agent Failure Patterns" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Multi-Agent Failure Patterns
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accueil
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Temps & Synchronisation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Temps & Synchronisation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-temps-synchronisation/pattern-01/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Timezone Mismatch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Boucles & Orchestration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Boucles & Orchestration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-boucles-orchestration/pattern-02/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Rapid-Fire Loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-boucles-orchestration/pattern-03/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Cascade de Penalites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-boucles-orchestration/pattern-09/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Agent Infinite Loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calculs & Etat
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Calculs & Etat
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Unit Mismatch 100x
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Unit Mismatch 100x
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-symptome-observable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Symptome observable
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-histoire-vecue-anonymisee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Histoire vecue (anonymisee)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-cause-racine-technique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Cause racine technique
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Detection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Detection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-detection-manuelle-audit-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Detection manuelle (audit code)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-detection-automatisee-cicd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Detection automatisee (CI/CD)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-detection-runtime-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Detection runtime (production)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-correction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Correction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Correction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-fix-immediat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Fix immediat
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-fix-robuste" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Fix robuste
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-prevention-architecturale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Prevention architecturale
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-anti-patterns-a-eviter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Anti-patterns a eviter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-cas-limites-et-variantes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Cas limites et variantes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-checklist-daudit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Checklist d'audit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-pour-aller-plus-loin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Pour aller plus loin
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pattern-06/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Silent NameError
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Securite & Secrets
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Securite & Secrets
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-securite-secrets/pattern-07/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Hardcoded Secret
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    I/O & Persistence
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    I/O & Persistence
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-io-persistence/pattern-04/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Multi-File State Desync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-io-persistence/pattern-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Data Pipeline Freeze
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filtrage & Decisions
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Filtrage & Decisions
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-filtrage-decisions/pattern-10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Survival Mode Deadlock
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gouvernance Multi-Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Gouvernance Multi-Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-gouvernance-multi-agents/pattern-11/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Race Condition Shared File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-symptome-observable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Symptome observable
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-histoire-vecue-anonymisee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Histoire vecue (anonymisee)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-cause-racine-technique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Cause racine technique
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Detection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Detection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-detection-manuelle-audit-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Detection manuelle (audit code)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-detection-automatisee-cicd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Detection automatisee (CI/CD)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-detection-runtime-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Detection runtime (production)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-correction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Correction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Correction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-fix-immediat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Fix immediat
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-fix-robuste" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Fix robuste
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-prevention-architecturale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Prevention architecturale
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-anti-patterns-a-eviter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Anti-patterns a eviter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-cas-limites-et-variantes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Cas limites et variantes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-checklist-daudit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Checklist d'audit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-pour-aller-plus-loin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Pour aller plus loin
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="pattern-n05-unit-mismatch-100x">Pattern N°05 — Unit Mismatch 100x<a class="headerlink" href="#pattern-n05-unit-mismatch-100x" title="Permanent link">&para;</a></h1>
+<p><strong>Categorie :</strong> Calculs &amp; Etat
+<strong>Severite :</strong> Critical
+<strong>Frameworks impactes :</strong> LangChain / CrewAI / AutoGen / LangGraph / Custom
+<strong>Temps moyen de debogage si non detecte :</strong> 1 a 5 jours (les consequences sont souvent visibles immediatement mais la cause racine est cherchee au mauvais endroit)</p>
+<hr />
+<h2 id="1-symptome-observable">1. Symptome observable<a class="headerlink" href="#1-symptome-observable" title="Permanent link">&para;</a></h2>
+<p>Une action est executee avec une magnitude <strong>10x a 100x superieure</strong> (ou inferieure) a ce qui etait prevu. Un appel API qui devait consommer 40 tokens en consomme 4000. Un budget de $10 est depense en $1000. Un timeout de 30 secondes est interprete comme 30 millisecondes. La formule est correcte, les pourcentages sont corrects, mais la <strong>valeur unitaire</strong> est fausse.</p>
+<p>Le symptome le plus piege : le systeme ne leve aucune erreur. Le calcul est mathematiquement correct — c'est un input qui est faux. Si <code>unit_cost = 0.01</code> alors que ca devrait etre <code>1.0</code>, le resultat sera 100x trop petit, mais Python ne sait pas que <code>0.01</code> est faux.</p>
+<p>Les consequences varient selon la direction de l'erreur. Si la valeur est trop grande : overconsommation de ressources, budget explose, rate limits atteints. Si la valeur est trop petite : actions negligeables, resultats inutilisables, le systeme semble "ne rien faire".</p>
+<h2 id="2-histoire-vecue-anonymisee">2. Histoire vecue (anonymisee)<a class="headerlink" href="#2-histoire-vecue-anonymisee" title="Permanent link">&para;</a></h2>
+<p>Un systeme multi-agents gerait des budgets de tokens LLM pour plusieurs modeles. Le module de calcul principal utilisait <code>cost_per_token = 0.001</code> (correct pour le modele A). Le module de monitoring, developpe separement, utilisait <code>cost_per_token = 0.00001</code> (copie-colle depuis la documentation d'un modele beaucoup moins cher).</p>
+<p>Le resultat : le monitoring affichait des couts 100x inferieurs a la realite. L'equipe pensait depenser $50/jour alors que la facture reelle etait de $5000/jour. Le bug a ete decouvert a la reception de la premiere facture mensuelle — un choc de $150,000 au lieu des $1,500 estimes.</p>
+<p>La cause : un copier-coller d'une valeur unitaire d'un modele a un autre, sans verification. Le code etait identique entre les deux modules, seule la constante differait.</p>
+<h2 id="3-cause-racine-technique">3. Cause racine technique<a class="headerlink" href="#3-cause-racine-technique" title="Permanent link">&para;</a></h2>
+<p>Le bug se produit quand <strong>deux modules du meme systeme utilisent des valeurs unitaires differentes</strong> pour la meme entite. Chaque module hardcode sa propre constante, copiee depuis une documentation ou un autre module, sans source centralisee :</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Module A — calcul de budget (correct)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">COST_PER_TOKEN</span> <span class="o">=</span> <span class="mf">0.001</span>  <span class="c1"># $0.001 per token for Model X</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Module B — monitoring (BUG — copie depuis Model Y, 100x moins cher)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">COST_PER_TOKEN</span> <span class="o">=</span> <span class="mf">0.00001</span>  <span class="c1"># Wrong! Copied from cheaper model docs</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># La formule est identique, seule la constante differe :</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">total_cost</span> <span class="o">=</span> <span class="n">tokens_used</span> <span class="o">*</span> <span class="n">COST_PER_TOKEN</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># Module A: 4000 * 0.001 = $4.00 (correct)</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Module B: 4000 * 0.00001 = $0.04 (100x trop bas)</span>
+</code></pre></div>
+<p>Le probleme fondamental est l'<strong>absence de source unique</strong> pour les valeurs unitaires. Chaque module a sa propre copie de la constante, et rien ne garantit qu'elles sont identiques. Le copier-coller est le vecteur d'infection : la constante est correcte dans le module original, incorrecte dans la copie.</p>
+<p>Les variantes incluent :
+- Melanger dollars et centimes (<code>amount = 500</code> : est-ce 500$ ou 500 cents ?)
+- Melanger secondes et millisecondes (<code>timeout = 30</code> : 30s ou 30ms ?)
+- Melanger tokens et kiloTokens (<code>budget = 4</code> : 4 tokens ou 4000 ?)
+- Utiliser des valeurs de test en production (<code>unit_cost = 0.0</code> ou <code>unit_cost = 1.0</code> au lieu de la vraie valeur)</p>
+<h2 id="4-detection">4. Detection<a class="headerlink" href="#4-detection" title="Permanent link">&para;</a></h2>
+<h3 id="41-detection-manuelle-audit-code">4.1 Detection manuelle (audit code)<a class="headerlink" href="#41-detection-manuelle-audit-code" title="Permanent link">&para;</a></h3>
+<p>Lister toutes les constantes unitaires et les comparer entre modules :</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Chercher les definitions de constantes unitaires</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>grep<span class="w"> </span>-rn<span class="w"> </span><span class="s2">&quot;COST_PER\|PRICE_PER\|UNIT_\|_PER_TOKEN\|_PER_UNIT&quot;</span><span class="w"> </span>--include<span class="o">=</span><span class="s2">&quot;*.py&quot;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Chercher les valeurs hardcodees dans les calculs</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>grep<span class="w"> </span>-rn<span class="w"> </span><span class="s2">&quot;\* 0\.0\|\* 1\.0\|/ 0\.0\|/ 1\.0&quot;</span><span class="w"> </span>--include<span class="o">=</span><span class="s2">&quot;*.py&quot;</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Chercher les copier-colles suspects (meme variable dans plusieurs fichiers)</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="k">for</span><span class="w"> </span>var<span class="w"> </span><span class="k">in</span><span class="w"> </span>COST_PER_TOKEN<span class="w"> </span>UNIT_PRICE<span class="w"> </span>POINT_VALUE<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;=== </span><span class="nv">$var</span><span class="s2"> ===&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>grep<span class="w"> </span>-rn<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$var</span><span class="s2">&quot;</span><span class="w"> </span>--include<span class="o">=</span><span class="s2">&quot;*.py&quot;</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="k">done</span>
+</code></pre></div>
+<h3 id="42-detection-automatisee-cicd">4.2 Detection automatisee (CI/CD)<a class="headerlink" href="#42-detection-automatisee-cicd" title="Permanent link">&para;</a></h3>
+<p>Centraliser les valeurs unitaires et tester au demarrage que tous les modules utilisent la meme source :</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># test_unit_consistency.py</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">config</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNIT_REGISTRY</span>  <span class="c1"># Single source of truth</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_no_hardcoded_units</span><span class="p">():</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure no module hardcodes unit values that should come from the registry.&quot;&quot;&quot;</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span><span class="o">,</span><span class="w"> </span><span class="nn">re</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="c1"># Known unit constants that must come from UNIT_REGISTRY</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="n">forbidden_patterns</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="sa">r</span><span class="s1">&#39;COST_PER_TOKEN\s*=\s*[\d.]&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>        <span class="sa">r</span><span class="s1">&#39;PRICE_PER_UNIT\s*=\s*[\d.]&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>        <span class="sa">r</span><span class="s1">&#39;POINT_VALUE\s*=\s*[\d.]&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="p">]</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>    <span class="n">violations</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>    <span class="k">for</span> <span class="n">py_file</span> <span class="ow">in</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;src&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*.py&quot;</span><span class="p">):</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>        <span class="k">if</span> <span class="n">py_file</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;config.py&quot;</span><span class="p">:</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>            <span class="k">continue</span>  <span class="c1"># Skip the registry itself</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>        <span class="n">content</span> <span class="o">=</span> <span class="n">py_file</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>        <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">forbidden_patterns</span><span class="p">:</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>            <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>                <span class="n">violations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">py_file</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">content</span><span class="p">[:</span><span class="n">match</span><span class="o">.</span><span class="n">start</span><span class="p">()]</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="n">violations</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Hardcoded unit values found:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">violations</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="43-detection-runtime-production">4.3 Detection runtime (production)<a class="headerlink" href="#43-detection-runtime-production" title="Permanent link">&para;</a></h3>
+<p>Garde-fou sur chaque action : verifier que la magnitude est dans une plage attendue avant d'executer :</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">MagnitudeGuard</span><span class="p">:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Blocks actions whose magnitude exceeds expected bounds.&quot;&quot;&quot;</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]):</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">bounds</span>  <span class="c1"># {&quot;action_name&quot;: (min, max)}</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="k">if</span> <span class="n">action</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">:</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>            <span class="k">return</span> <span class="kc">True</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>        <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="n">action</span><span class="p">]</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="n">low</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="n">high</span><span class="p">:</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>                <span class="sa">f</span><span class="s2">&quot;MAGNITUDE GUARD: </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> outside bounds [</span><span class="si">{</span><span class="n">low</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">high</span><span class="si">}</span><span class="s2">]. &quot;</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>                <span class="sa">f</span><span class="s2">&quot;Probable unit mismatch.&quot;</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>            <span class="p">)</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>        <span class="k">return</span> <span class="kc">True</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="c1"># Usage:</span>
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="n">guard</span> <span class="o">=</span> <span class="n">MagnitudeGuard</span><span class="p">({</span>
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>    <span class="s2">&quot;token_budget&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100_000</span><span class="p">),</span>
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>    <span class="s2">&quot;api_cost_usd&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">),</span>
+<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>    <span class="s2">&quot;timeout_seconds&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>
+<a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a><span class="p">})</span>
+<a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a><span class="n">guard</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;api_cost_usd&quot;</span><span class="p">,</span> <span class="mf">5000.0</span><span class="p">)</span>  <span class="c1"># Raises: probable unit mismatch</span>
+</code></pre></div>
+<h2 id="5-correction">5. Correction<a class="headerlink" href="#5-correction" title="Permanent link">&para;</a></h2>
+<h3 id="51-fix-immediat">5.1 Fix immediat<a class="headerlink" href="#51-fix-immediat" title="Permanent link">&para;</a></h3>
+<p>Identifier la bonne valeur unitaire et la corriger dans le module fautif :</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># AVANT (bug: copie depuis un autre modele)</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">COST_PER_TOKEN</span> <span class="o">=</span> <span class="mf">0.00001</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># APRES (correct: valeur du bon modele)</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">COST_PER_TOKEN</span> <span class="o">=</span> <span class="mf">0.001</span>
+</code></pre></div>
+<p>Puis ajouter un garde-fou qui bloque les valeurs aberrantes :</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">compute_cost</span><span class="p">(</span><span class="n">tokens</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cost_per_token</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">cost</span> <span class="o">=</span> <span class="n">tokens</span> <span class="o">*</span> <span class="n">cost_per_token</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="k">if</span> <span class="n">cost</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>  <span class="c1"># Hard cap: aucune action ne devrait couter &gt; $1000</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cost too high: $</span><span class="si">{</span><span class="n">cost</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">tokens</span><span class="si">}</span><span class="s2"> tokens. Check unit value.&quot;</span><span class="p">)</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="k">return</span> <span class="n">cost</span>
+</code></pre></div>
+<h3 id="52-fix-robuste">5.2 Fix robuste<a class="headerlink" href="#52-fix-robuste" title="Permanent link">&para;</a></h3>
+<p>Centraliser toutes les valeurs unitaires dans un registre unique :</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="sd">&quot;&quot;&quot;unit_registry.py — Single source of truth for all unit values.&quot;&quot;&quot;</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">UNITS</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="s2">&quot;gpt-4&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;cost_per_token&quot;</span><span class="p">:</span> <span class="mf">0.00003</span><span class="p">,</span> <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">128000</span><span class="p">},</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="s2">&quot;gpt-4o&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;cost_per_token&quot;</span><span class="p">:</span> <span class="mf">0.0000025</span><span class="p">,</span> <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">128000</span><span class="p">},</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="s2">&quot;claude-opus&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;cost_per_token&quot;</span><span class="p">:</span> <span class="mf">0.000015</span><span class="p">,</span> <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">200000</span><span class="p">},</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="s2">&quot;llama-70b&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;cost_per_token&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">8192</span><span class="p">},</span>  <span class="c1"># Free tier</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="p">}</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_unit</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">unit</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;The ONLY way to get a unit value. Raises if model/unit unknown.&quot;&quot;&quot;</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    <span class="k">if</span> <span class="n">model</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">UNITS</span><span class="p">:</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown model: </span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">. Add it to unit_registry.py&quot;</span><span class="p">)</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>    <span class="k">if</span> <span class="n">unit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">UNITS</span><span class="p">[</span><span class="n">model</span><span class="p">]:</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown unit &#39;</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&#39; for model </span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>    <span class="k">return</span> <span class="n">UNITS</span><span class="p">[</span><span class="n">model</span><span class="p">][</span><span class="n">unit</span><span class="p">]</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="c1"># Usage across all modules:</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="n">cost</span> <span class="o">=</span> <span class="n">tokens</span> <span class="o">*</span> <span class="n">get_unit</span><span class="p">(</span><span class="s2">&quot;gpt-4&quot;</span><span class="p">,</span> <span class="s2">&quot;cost_per_token&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="6-prevention-architecturale">6. Prevention architecturale<a class="headerlink" href="#6-prevention-architecturale" title="Permanent link">&para;</a></h2>
+<p>La prevention repose sur deux principes : <strong>centralisation</strong> et <strong>garde-fous</strong>.</p>
+<p><strong>Centralisation</strong> : toutes les valeurs unitaires vivent dans un seul fichier/module (<code>unit_registry.py</code> ou <code>config.yaml</code>). Aucun autre module n'a le droit de definir ses propres constantes unitaires. Un test CI verifie qu'aucun module ne hardcode une valeur qui devrait venir du registre.</p>
+<p><strong>Garde-fous</strong> : avant chaque action dont la magnitude depend d'une valeur unitaire, un <code>MagnitudeGuard</code> verifie que le resultat est dans une plage attendue. Si un calcul produit un budget de tokens de 4 millions ou un cout de $50,000, c'est presque certainement un bug unitaire — le guard le bloque et alerte.</p>
+<p>En complement, les valeurs unitaires du registre doivent etre validees au demarrage du systeme par un health check qui compare avec une source externe (API du provider, documentation officielle).</p>
+<h2 id="7-anti-patterns-a-eviter">7. Anti-patterns a eviter<a class="headerlink" href="#7-anti-patterns-a-eviter" title="Permanent link">&para;</a></h2>
+<ol>
+<li>
+<p><strong>Copier-coller les valeurs unitaires entre modules.</strong> C'est le vecteur d'infection principal. Toujours importer depuis le registre.</p>
+</li>
+<li>
+<p><strong>Pas de guard sur les valeurs calculees.</strong> Un <code>total = budget / unit_value</code> sans verification de borne est une bombe a retardement. Si <code>unit_value</code> est 100x trop petit, <code>total</code> est 100x trop grand.</p>
+</li>
+<li>
+<p><strong>Melanger les unites dans le meme pipeline.</strong> Un module qui passe un montant en centimes a un module qui attend des dollars cree un mismatch silencieux.</p>
+</li>
+<li>
+<p><strong>Utiliser des valeurs de test en production.</strong> <code>unit_cost = 0.0</code> pour "gratuit en dev" qui reste en prod = actions sans cout apparent = aucune alerte sur la surconsommation.</p>
+</li>
+<li>
+<p><strong>Pas d'audit croise au demarrage.</strong> Le systeme devrait verifier au boot que tous les modules ont les memes valeurs unitaires pour les memes entites.</p>
+</li>
+</ol>
+<h2 id="8-cas-limites-et-variantes">8. Cas limites et variantes<a class="headerlink" href="#8-cas-limites-et-variantes" title="Permanent link">&para;</a></h2>
+<p><strong>Variante 1 : Changement de pricing.</strong> Le provider LLM change ses prix. Le registre est mis a jour mais un module secondaire a sa propre copie hardcodee qui reste a l'ancien prix. Le monitoring affiche des couts incorrects pendant des semaines.</p>
+<p><strong>Variante 2 : Unites differentes par region.</strong> Le meme service coute $0.01/appel en US et EUR0.01/appel en EU. Si le systeme ne convertit pas les devises, les couts sont compares sans conversion — 1 USD != 1 EUR.</p>
+<p><strong>Variante 3 : Precision flottante.</strong> <code>0.1 + 0.2 = 0.30000000000000004</code> en Python. Sur des millions d'operations, la derive de precision peut accumuler des erreurs significatives. Utiliser <code>decimal.Decimal</code> pour les calculs financiers.</p>
+<p><strong>Variante 4 : Valeurs unitaires nulles.</strong> <code>unit_cost = 0.0</code> (free tier) dans un calcul <code>budget / unit_cost</code> → <code>ZeroDivisionError</code>. Le guard doit aussi verifier les valeurs nulles.</p>
+<h2 id="9-checklist-daudit">9. Checklist d'audit<a class="headerlink" href="#9-checklist-daudit" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] Toutes les valeurs unitaires sont centralisees dans un registre unique</li>
+<li>[ ] Aucun module ne hardcode de valeur unitaire (verifie par test CI)</li>
+<li>[ ] Un garde-fou verifie la magnitude avant chaque action critique</li>
+<li>[ ] Le registre est valide au demarrage contre une source de reference</li>
+<li>[ ] Les unites sont documentees explicitement (dollars vs centimes, secondes vs millisecondes)</li>
+</ul>
+<h2 id="10-pour-aller-plus-loin">10. Pour aller plus loin<a class="headerlink" href="#10-pour-aller-plus-loin" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Pattern court correspondant : <a href="https://github.com/samueltradingpro1216-ops/multi-agent-failure-patterns/tree/main/pattern-05">Pattern 05 — Unit Mismatch 100x</a></li>
+<li>Patterns connexes : #03 (Cascade de Penalites — un mismatch unitaire peut amplifier une cascade), #04 (Multi-File State Desync — la valeur unitaire peut etre stockee a plusieurs endroits avec des valeurs differentes)</li>
+<li>Lectures recommandees :</li>
+<li>"Mars Climate Orbiter" (NASA, 1999) — l'exemple historique le plus celebre de mismatch unitaire (imperial vs metrique), ayant cause la perte d'un satellite de $125 millions</li>
+<li>Documentation OpenAI/Anthropic sur le pricing par token — les unites changent entre modeles et entre input/output</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://tally.so/r/vGODE8" target="_blank" rel="noopener" title="Newsletter — early-bird -50%" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M536.4-26.3c9.8-3.5 20.6-1 28 6.3s9.8 18.2 6.3 28l-178 496.9c-5 13.9-18.1 23.1-32.8 23.1-14.2 0-27-8.6-32.3-21.7l-64.2-158c-4.5-11-2.5-23.6 5.2-32.6l94.5-112.4c5.1-6.1 4.7-15-.9-20.6s-14.6-6-20.6-.9l-112.4 94.3c-9.1 7.6-21.6 9.6-32.6 5.2L38.1 216.8c-13.1-5.3-21.7-18.1-21.7-32.3 0-14.7 9.2-27.8 23.1-32.8z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
