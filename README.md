@@ -8,6 +8,16 @@ Ces patterns s'appliquent a toute architecture multi-agents : LangChain, CrewAI,
 
 ---
 
+## 📖 Lire le playbook complet
+
+Les 11 patterns sont disponibles en format long et structure sur le site dedie :
+
+**➡️ https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/**
+
+Chaque fiche contient : symptome observable, histoire vecue, cause racine technique, methodes de detection (manuelle / CI / runtime), correction avec code executable, prevention architecturale, et checklist d'audit.
+
+---
+
 ## ⭐ Tu trouves ce repo utile ?
 
 Mets une etoile pour soutenir le projet et recevoir les notifications de mises a jour. Le catalogue est mis a jour chaque semaine.
