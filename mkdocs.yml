@@ -47,19 +47,30 @@ nav:
   - Home: index.md
   - Time & Synchronization:
     - "01 — Timezone Mismatch": 01-temps-synchronisation/pattern-01.md
+    - "15 — Command Timestamp Rejection": 01-time-synchronization/pattern-15.md
   - Loops & Orchestration:
     - "02 — Rapid-Fire Loop": 02-boucles-orchestration/pattern-02.md
     - "03 — Penalty Cascade": 02-boucles-orchestration/pattern-03.md
     - "09 — Agent Infinite Loop": 02-boucles-orchestration/pattern-09.md
+    - "12 — Cascade Write in Single Cycle": 02-loops-orchestration/pattern-12.md
   - Computation & State:
     - "05 — Unit Mismatch 100x": 03-calculs-etat/pattern-05.md
     - "06 — Silent NameError": 03-calculs-etat/pattern-06.md
+    - "13 — Silent Config Override": 03-computation-state/pattern-13.md
+    - "17 — Division Edge Case": 03-computation-state/pattern-17.md
   - Security & Secrets:
     - "07 — Hardcoded Secret": 04-securite-secrets/pattern-07.md
   - I/O & Persistence:
     - "04 — Multi-File State Desync": 05-io-persistence/pattern-04.md
     - "08 — Data Pipeline Freeze": 05-io-persistence/pattern-08.md
+    - "14 — Stale Lock File": 05-io-persistence/pattern-14.md
+  - Detection & Monitoring:
+    - "18 — Snapshot vs Sustained Check": 07-detection-monitoring/pattern-18.md
+    - "19 — False Positive Crash Detection": 07-detection-monitoring/pattern-19.md
   - Filtering & Decisions:
     - "10 — Survival Mode Deadlock": 08-filtrage-decisions/pattern-10.md
+    - "16 — Missing Guard on Critical Operation": 08-filtering-decisions/pattern-16.md
   - Multi-Agent Governance:
     - "11 — Race Condition on Shared File": 09-gouvernance-multi-agents/pattern-11.md
+    - "20 — Missing File Encoding": 09-multi-agent-governance/pattern-20.md
+    - "21 — LLM Pool Contention": 09-multi-agent-governance/pattern-21.md

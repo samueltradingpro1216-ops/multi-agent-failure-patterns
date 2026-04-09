@@ -26,9 +26,9 @@ Mets une etoile pour soutenir le projet et recevoir les notifications de mises a
 
 ## Statut
 
-- **11 / 66 patterns** publies avec code executable
-- 55 patterns en cours de redaction
-- English version coming soon
+- **21 / 66 patterns** published with executable code
+- 45 patterns in progress
+- Full English playbook live on GitHub Pages
 
 ---
 
