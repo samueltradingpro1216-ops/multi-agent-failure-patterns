@@ -41,6 +41,10 @@
          <lastmod>2026-04-10</lastmod>
     </url>
     <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/02-loops-orchestration/pattern-32/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
          <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/03-calculs-etat/pattern-05/</loc>
          <lastmod>2026-04-10</lastmod>
     </url>
@@ -69,11 +73,19 @@
          <lastmod>2026-04-10</lastmod>
     </url>
     <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/03-computation-state/pattern-33/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
          <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/04-securite-secrets/pattern-07/</loc>
          <lastmod>2026-04-10</lastmod>
     </url>
     <url>
          <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/04-security-secrets/pattern-28/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/04-security-secrets/pattern-39/</loc>
          <lastmod>2026-04-10</lastmod>
     </url>
     <url>
@@ -93,7 +105,43 @@
          <lastmod>2026-04-10</lastmod>
     </url>
     <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/05-io-persistence/pattern-34/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/05-io-persistence/pattern-35/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/05-io-persistence/pattern-36/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/05-io-persistence/pattern-37/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/05-io-persistence/pattern-38/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
          <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/06-dead-code-architecture/pattern-30/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/06-dead-code-architecture/pattern-40/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/06-dead-code-architecture/pattern-41/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/06-dead-code-architecture/pattern-42/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/06-dead-code-architecture/pattern-43/</loc>
          <lastmod>2026-04-10</lastmod>
     </url>
     <url>
@@ -109,7 +157,27 @@
          <lastmod>2026-04-10</lastmod>
     </url>
     <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/07-detection-monitoring/pattern-44/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/07-detection-monitoring/pattern-45/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/07-detection-monitoring/pattern-46/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
          <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/08-filtering-decisions/pattern-16/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/08-filtering-decisions/pattern-47/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/08-filtering-decisions/pattern-48/</loc>
          <lastmod>2026-04-10</lastmod>
     </url>
     <url>
@@ -126,6 +194,14 @@
     </url>
     <url>
          <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/09-multi-agent-governance/pattern-21/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/09-multi-agent-governance/pattern-49/</loc>
+         <lastmod>2026-04-10</lastmod>
+    </url>
+    <url>
+         <loc>https://samueltradingpro1216-ops.github.io/multi-agent-failure-patterns/09-multi-agent-governance/pattern-50/</loc>
          <lastmod>2026-04-10</lastmod>
     </url>
 </urlset>
