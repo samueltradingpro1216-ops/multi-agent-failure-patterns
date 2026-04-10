@@ -53,20 +53,31 @@ nav:
     - "03 — Penalty Cascade": 02-boucles-orchestration/pattern-03.md
     - "09 — Agent Infinite Loop": 02-boucles-orchestration/pattern-09.md
     - "12 — Cascade Write in Single Cycle": 02-loops-orchestration/pattern-12.md
+    - "22 — Cron Duplicate Execution": 02-loops-orchestration/pattern-22.md
+    - "23 — Orphan Commands to Disabled Agents": 02-loops-orchestration/pattern-23.md
+    - "24 — Double-Fire Same Cycle": 02-loops-orchestration/pattern-24.md
   - Computation & State:
     - "05 — Unit Mismatch 100x": 03-calculs-etat/pattern-05.md
     - "06 — Silent NameError": 03-calculs-etat/pattern-06.md
     - "13 — Silent Config Override": 03-computation-state/pattern-13.md
     - "17 — Division Edge Case": 03-computation-state/pattern-17.md
+    - "25 — Baseline Reset": 03-computation-state/pattern-25.md
+    - "26 — Counter Not Persisted": 03-computation-state/pattern-26.md
+    - "27 — None Reinitialization Crash": 03-computation-state/pattern-27.md
   - Security & Secrets:
     - "07 — Hardcoded Secret": 04-securite-secrets/pattern-07.md
+    - "28 — SSL Verification Disabled": 04-security-secrets/pattern-28.md
   - I/O & Persistence:
     - "04 — Multi-File State Desync": 05-io-persistence/pattern-04.md
     - "08 — Data Pipeline Freeze": 05-io-persistence/pattern-08.md
     - "14 — Stale Lock File": 05-io-persistence/pattern-14.md
+    - "29 — Log Never Rotated": 05-io-persistence/pattern-29.md
+  - Dead Code & Architecture:
+    - "30 — Critical Module Never Imported": 06-dead-code-architecture/pattern-30.md
   - Detection & Monitoring:
     - "18 — Snapshot vs Sustained Check": 07-detection-monitoring/pattern-18.md
     - "19 — False Positive Crash Detection": 07-detection-monitoring/pattern-19.md
+    - "31 — Error Returns Success": 07-detection-monitoring/pattern-31.md
   - Filtering & Decisions:
     - "10 — Survival Mode Deadlock": 08-filtrage-decisions/pattern-10.md
     - "16 — Missing Guard on Critical Operation": 08-filtering-decisions/pattern-16.md
