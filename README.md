@@ -26,8 +26,8 @@ Mets une etoile pour soutenir le projet et recevoir les notifications de mises a
 
 ## Statut
 
-- **31 / 66 patterns** published with executable code
-- 35 patterns in progress
+- **50 / 66 patterns** published — Playbook v1 COMPLETE
+- Full playbook with 50 detailed pattern sheets live on GitHub Pages
 - Full English playbook live on GitHub Pages
 
 ---

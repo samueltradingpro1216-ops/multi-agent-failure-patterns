@@ -56,6 +56,7 @@ nav:
     - "22 — Cron Duplicate Execution": 02-loops-orchestration/pattern-22.md
     - "23 — Orphan Commands to Disabled Agents": 02-loops-orchestration/pattern-23.md
     - "24 — Double-Fire Same Cycle": 02-loops-orchestration/pattern-24.md
+    - "32 — Iterate-Then-Skip": 02-loops-orchestration/pattern-32.md
   - Computation & State:
     - "05 — Unit Mismatch 100x": 03-calculs-etat/pattern-05.md
     - "06 — Silent NameError": 03-calculs-etat/pattern-06.md
@@ -64,24 +65,42 @@ nav:
     - "25 — Baseline Reset": 03-computation-state/pattern-25.md
     - "26 — Counter Not Persisted": 03-computation-state/pattern-26.md
     - "27 — None Reinitialization Crash": 03-computation-state/pattern-27.md
+    - "33 — Value Written to Wrong Dict": 03-computation-state/pattern-33.md
   - Security & Secrets:
     - "07 — Hardcoded Secret": 04-securite-secrets/pattern-07.md
     - "28 — SSL Verification Disabled": 04-security-secrets/pattern-28.md
+    - "39 — Identifier Collision": 04-security-secrets/pattern-39.md
   - I/O & Persistence:
     - "04 — Multi-File State Desync": 05-io-persistence/pattern-04.md
     - "08 — Data Pipeline Freeze": 05-io-persistence/pattern-08.md
     - "14 — Stale Lock File": 05-io-persistence/pattern-14.md
     - "29 — Log Never Rotated": 05-io-persistence/pattern-29.md
+    - "34 — Handle Recreated Every Call": 05-io-persistence/pattern-34.md
+    - "35 — Local Bypass of Write Function": 05-io-persistence/pattern-35.md
+    - "36 — Wrong Directory Read": 05-io-persistence/pattern-36.md
+    - "37 — I/O on Hot Path": 05-io-persistence/pattern-37.md
+    - "38 — json.load Without Context Manager": 05-io-persistence/pattern-38.md
   - Dead Code & Architecture:
     - "30 — Critical Module Never Imported": 06-dead-code-architecture/pattern-30.md
+    - "40 — Dead Functions": 06-dead-code-architecture/pattern-40.md
+    - "41 — Stub Never Implemented": 06-dead-code-architecture/pattern-41.md
+    - "42 — Orphan Module No Callers": 06-dead-code-architecture/pattern-42.md
+    - "43 — Fragile Bare Import": 06-dead-code-architecture/pattern-43.md
   - Detection & Monitoring:
     - "18 — Snapshot vs Sustained Check": 07-detection-monitoring/pattern-18.md
     - "19 — False Positive Crash Detection": 07-detection-monitoring/pattern-19.md
     - "31 — Error Returns Success": 07-detection-monitoring/pattern-31.md
+    - "44 — Connection Leak on Error Path": 07-detection-monitoring/pattern-44.md
+    - "45 — Non-Standard Existence Check": 07-detection-monitoring/pattern-45.md
+    - "46 — Adversarial Agent Too Conservative": 07-detection-monitoring/pattern-46.md
   - Filtering & Decisions:
     - "10 — Survival Mode Deadlock": 08-filtrage-decisions/pattern-10.md
     - "16 — Missing Guard on Critical Operation": 08-filtering-decisions/pattern-16.md
+    - "47 — Threshold Mismatch Between Components": 08-filtering-decisions/pattern-47.md
+    - "48 — Missing Decision Conditions": 08-filtering-decisions/pattern-48.md
   - Multi-Agent Governance:
     - "11 — Race Condition on Shared File": 09-gouvernance-multi-agents/pattern-11.md
     - "20 — Missing File Encoding": 09-multi-agent-governance/pattern-20.md
     - "21 — LLM Pool Contention": 09-multi-agent-governance/pattern-21.md
+    - "49 — Cost Policy Violation": 09-multi-agent-governance/pattern-49.md
+    - "50 — Agent State Lost on Restart": 09-multi-agent-governance/pattern-50.md
